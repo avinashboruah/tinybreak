@@ -45,9 +45,14 @@
   .screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;
     z-index:20;padding:24px;text-align:center;
     background:radial-gradient(120% 90% at 50% 15%, rgba(30,90,150,.35), rgba(6,14,28,.86) 70%);
-    backdrop-filter:blur(2px)}
-  .screen.on{display:flex;animation:fade .35s ease}
-  @keyframes fade{from{opacity:0}to{opacity:1}}
+    backdrop-filter:blur(2px);opacity:0;transform:translateY(12px);transition:opacity .38s ease,transform .38s ease;pointer-events:none}
+  .screen.on{display:flex;opacity:1;transform:translateY(0);pointer-events:auto;animation:none}
+  .screen.entering{display:flex;opacity:0;transform:translateY(16px)}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fade-out{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-10px)}}
+  /* ---- Cinematic overlay ---- */
+  #cinematic-overlay{position:fixed;inset:0;z-index:35;pointer-events:none;opacity:0;transition:opacity .5s ease}
+  #cinematic-overlay.on{opacity:1}
   .logo{font-family:"Russo One";font-size:clamp(38px,9vw,96px);line-height:.92;text-transform:uppercase;
     color:#fff;text-shadow:0 6px 0 #1b4d80,0 10px 22px rgba(0,0,0,.5);letter-spacing:2px}
   .logo b{color:var(--gold);text-shadow:0 6px 0 #a9791a,0 10px 22px rgba(0,0,0,.5)}
@@ -100,14 +105,40 @@
   .sp-badge.ready .sp-nm{color:var(--gold)}
   .sp-key{font-size:10px;color:#9fc2e6;display:flex;align-items:center;gap:5px}
   .sp-key kbd{font-size:9px;padding:1px 5px}
-  .sp-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:1px;text-transform:uppercase;
-    padding:5px 10px;border-radius:999px;margin-top:2px;background:rgba(123,75,255,.16);color:#c9b0ff;border:1px solid rgba(123,75,255,.4);align-self:flex-start}
-  .pw-row{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:12px}
+  /* ---- Forge Bar ---- */
+  #forge-bar-wrap{position:absolute;bottom:92px;left:50%;transform:translateX(-50%);display:none;flex-direction:column;align-items:center;gap:4px;pointer-events:none}
+  #forge-bar-wrap.on{display:flex}
+  .forge-lbl{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#00f0c8;text-shadow:0 0 8px #00f0c8;font-family:"Russo One"}
+  .forge-track{width:min(220px,50vw);height:11px;border-radius:6px;background:rgba(0,0,0,.5);border:1px solid rgba(0,240,200,.28);overflow:hidden}
+  .forge-fill{height:100%;width:0%;border-radius:5px;background:linear-gradient(90deg,#006655,#00f0c8);box-shadow:0 0 8px #00f0c8;transition:width .12s ease}
+  /* ---- Upgrade Cards ---- */
+  #forge-cards{position:fixed;inset:0;z-index:40;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+    background:rgba(0,0,0,.72);backdrop-filter:blur(8px);opacity:0;transition:opacity .3s ease}
+  #forge-cards.on{display:flex}
+  #forge-cards.visible{opacity:1}
+  .forge-title{font-family:"Russo One";font-size:clamp(18px,4vw,34px);letter-spacing:4px;text-transform:uppercase;color:#00f0c8;text-shadow:0 0 18px #00f0c8;
+    opacity:0;transform:translateY(-12px);transition:opacity .35s ease .15s,transform .35s ease .15s}
+  #forge-cards.visible .forge-title{opacity:1;transform:translateY(0)}
+  .forge-sub{font-size:12px;letter-spacing:2px;color:#9fc2e6;text-transform:uppercase;margin-top:-8px;
+    opacity:0;transition:opacity .3s ease .25s}
+  #forge-cards.visible .forge-sub{opacity:1}
+  .cards-row{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;padding:0 12px}
+  .upg-card{width:min(160px,42vw);background:rgba(8,20,44,.92);border:1px solid rgba(0,240,200,.3);border-radius:16px;
+    padding:18px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;
+    opacity:0;transform:scale(0.82) translateY(18px);
+    transition:opacity .32s ease,transform .32s cubic-bezier(.34,1.56,.64,1),box-shadow .15s,border-color .15s;text-align:center}
+  #forge-cards.visible .upg-card:nth-child(1){opacity:1;transform:scale(1) translateY(0);transition-delay:.18s,.18s,0s,0s}
+  #forge-cards.visible .upg-card:nth-child(2){opacity:1;transform:scale(1) translateY(0);transition-delay:.26s,.26s,0s,0s}
+  #forge-cards.visible .upg-card:nth-child(3){opacity:1;transform:scale(1) translateY(0);transition-delay:.34s,.34s,0s,0s}
+  .upg-card:hover,.upg-card:active{transform:translateY(-5px) scale(1.05) !important;box-shadow:0 0 28px rgba(0,240,200,.5);border-color:#00f0c8}
+  .upg-name{font-family:"Russo One";font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#fff}
+  .upg-desc{font-size:11px;color:#9fc2e6;line-height:1.4}
+  .pw-row{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:10px}
   .pw{width:56px;height:56px;border-radius:14px;background:var(--panel);border:1px solid var(--panelb);
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;position:relative;overflow:hidden}
   .pw .ic{font-size:22px}.pw .nm{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:#cfe6ff}
   .pw .to{position:absolute;bottom:0;left:0;height:4px;background:var(--gold)}
-  .boss-wrap{position:absolute;top:16px;left:50%;transform:translateX(-50%);width:min(520px,70vw);display:none;flex-direction:column;gap:5px;align-items:center}
+  .boss-wrap{position:absolute;top:60px;left:50%;transform:translateX(-50%);width:min(520px,70vw);display:none;flex-direction:column;gap:5px;align-items:center}
   .boss-wrap.on{display:flex}
   .boss-name{font-family:"Russo One";font-size:14px;letter-spacing:3px;text-transform:uppercase;color:#ff9db0;text-shadow:0 2px 4px #000}
   .boss-bar{width:100%;height:14px;border-radius:7px;background:rgba(0,0,0,.5);border:1px solid var(--panelb);overflow:hidden}
@@ -126,8 +157,9 @@
   .cstage{width:min(560px,80vw);height:300px;border-radius:20px;position:relative;overflow:hidden;
     background:radial-gradient(130% 100% at 50% 18%,#3182c4,#0b2137 72%);border:1px solid var(--panelb)}
   .cstage canvas{position:absolute;inset:0}
-  .cstage .lock-ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:64px;
-    background:rgba(6,14,28,.5);color:#9fc2e6;pointer-events:none}
+  .cstage .lock-ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:32px;
+    font-family:"Russo One",sans-serif;letter-spacing:2px;
+    background:rgba(6,14,28,.55);color:#9fc2e6;pointer-events:none}
   .cbtn{width:56px;height:56px;border-radius:50%;border:1px solid var(--panelb);background:var(--panel);color:#fff;
     font-family:"Russo One";font-size:30px;cursor:pointer;flex:none;transition:transform .1s,background .1s;
     display:flex;align-items:center;justify-content:center;line-height:0;padding-bottom:4px}
@@ -157,7 +189,7 @@
   .stat .sn{width:70px;text-transform:uppercase;letter-spacing:1px;color:#a9c8e6;font-size:10px}
   .stat .sb{flex:1;height:8px;border-radius:4px;background:rgba(0,0,0,.4);overflow:hidden}
   .stat .sb>i{display:block;height:100%;background:linear-gradient(90deg,#4fd6ff,#2f89c9)}
-  .price{display:inline-flex;align-items:center;gap:6px;color:var(--gold);font-family:"Russo One";font-size:15px}
+  .price{display:inline-flex;align-items:center;gap:6px;color:inherit;font-family:"Russo One";font-size:15px}
   .tag{position:absolute;top:14px;right:14px;font-size:10px;letter-spacing:2px;text-transform:uppercase;
     padding:4px 9px;border-radius:999px;background:rgba(255,210,74,.16);color:var(--gold);border:1px solid rgba(255,210,74,.4)}
   .tag.owned{background:rgba(91,255,158,.14);color:#7dffb2;border-color:rgba(91,255,158,.4)}
@@ -260,6 +292,7 @@
 </head>
 <body>
 <div id="game"></div>
+<div id="cinematic-overlay"></div>
 
 <!-- HUD -->
 <div id="hud">
@@ -279,16 +312,26 @@
   <div class="pw-row" id="pw-row"></div>
   <div class="sp-badge" id="sp-badge">
     <div class="sp-ring" id="sp-ring">
-      <div class="sp-core"><span class="sp-ic" id="sp-ic">⚡</span></div>
+      <div class="sp-core"><span class="sp-ic" id="sp-ic">SP</span></div>
       <div class="sp-cd" id="sp-cd"></div>
     </div>
     <div class="sp-meta">
       <span class="sp-nm" id="sp-nm">Special</span>
-      <span class="sp-key"><kbd>Shift</kbd> · ✌</span>
+      <span class="sp-key"><kbd>Shift</kbd></span>
     </div>
   </div>
+  <div id="forge-bar-wrap" class="on">
+    <div class="forge-lbl">FORGE</div>
+    <div class="forge-track"><div class="forge-fill" id="forge-fill"></div></div>
+  </div>
   <div class="toast" id="toast"></div>
+</div>
 
+<!-- FORGE CARD SCREEN -->
+<div id="forge-cards">
+  <div class="forge-title">SCRAP FORGE</div>
+  <div class="forge-sub">Choose one upgrade</div>
+  <div class="cards-row" id="cards-row"></div>
 </div>
 
 <!-- MENU -->
@@ -297,9 +340,9 @@
   <div class="sub">Tactical Sky Combat</div>
   <div class="coinbadge"><span class="coin-ic"></span><span id="menu-coins">0</span></div>
   <div class="btns">
-    <button class="btn" id="b-play">▶ Play</button>
-    <button class="btn sec" id="b-hangar">✈ Hangar</button>
-    <button class="btn ghost" id="b-settings">⚙ Settings & Rules</button>
+    <button class="btn" id="b-play">Play</button>
+    <button class="btn sec" id="b-hangar">Hangar</button>
+    <button class="btn ghost" id="b-settings">Settings & Rules</button>
   </div>
 </div>
 
@@ -318,7 +361,7 @@
     <div class="cinfo" id="c-info"></div>
     <div class="cdots" id="c-dots"></div>
     <div class="btns" style="width:min(340px,80vw);margin:26px auto 0">
-      <button class="btn sec" id="b-hangar-back">◀ Back</button>
+      <button class="btn sec" id="b-hangar-back">Back</button>
     </div>
   </div>
 </div>
@@ -332,12 +375,12 @@
   </div>
   <div class="rules-box" style="margin-top:20px; padding:16px; background:var(--panel); border:1px solid var(--panelb); border-radius:14px; max-width:420px; width:84vw; text-align:left; font-size:13px; line-height:1.6; color:#bfe0ff">
     <h3 style="font-family:'Russo One',sans-serif; font-size:15px; color:var(--gold); margin-bottom:10px; text-transform:uppercase">How to Play</h3>
-    <div style="margin-bottom:8px">✈ <b>Move:</b> Use <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / Arrow keys or <b>drag on mobile screen</b>.</div>
-    <div style="margin-bottom:8px">🔥 <b>Fire:</b> Hold <kbd>Space</kbd> or <b>touch-drag screen to auto-fire</b>.</div>
-    <div style="margin-bottom:8px">⚡ <b>Special:</b> Press <kbd>Shift</kbd> or <b>tap the shield/badge</b> to trigger special weapon when ready.</div>
-    <div>🎯 <b>Objective:</b> Fly through checkpoints, shoot enemy fighters/bosses, collect coins, and buy stronger jets in the Hangar!</div>
+    <div style="margin-bottom:8px"><b>Move:</b> Use <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / Arrow keys or <b>drag on mobile screen</b>.</div>
+    <div style="margin-bottom:8px"><b>Fire:</b> Hold <kbd>Space</kbd> or <b>touch-drag screen to auto-fire</b>.</div>
+    <div style="margin-bottom:8px"><b>Special:</b> Press <kbd>Shift</kbd> or <b>tap the shield/badge</b> to trigger special weapon when ready.</div>
+    <div><b>Objective:</b> Fly through checkpoints, shoot enemy fighters/bosses, collect coins, and buy stronger jets in the Hangar!</div>
   </div>
-  <div class="btns" style="width:min(340px,80vw)"><button class="btn sec" id="b-settings-back">◀ Back</button></div>
+  <div class="btns" style="width:min(340px,80vw)"><button class="btn sec" id="b-settings-back">Back</button></div>
 </div>
 
 <!-- LEVEL SELECT -->
@@ -345,7 +388,7 @@
   <div class="logo" style="font-size:38px">Select Level</div>
   <div class="sub">Clear a level to unlock the next</div>
   <div class="levelgrid" id="level-grid"></div>
-  <div class="btns" style="width:min(340px,80vw)"><button class="btn sec" id="b-levels-back">◀ Back</button></div>
+  <div class="btns" style="width:min(340px,80vw)"><button class="btn sec" id="b-levels-back">Back</button></div>
 </div>
 
 <!-- GAME OVER / VICTORY -->
@@ -360,11 +403,11 @@
     <div class="go-stat"><div class="v" id="go-coins">0</div><div class="k">Coins</div></div>
   </div>
   <div class="btns">
-    <button class="btn" id="b-next-level" style="display:none">▶ Next Level</button>
-    <button class="btn sec" id="b-retry">↻ Retry Level</button>
-    <button class="btn ghost" id="b-over-levels">☰ Levels</button>
-    <button class="btn ghost" id="b-over-hangar">✈ Hangar</button>
-    <button class="btn ghost" id="b-over-menu">⌂ Main Menu</button>
+    <button class="btn" id="b-next-level" style="display:none">Next Level</button>
+    <button class="btn sec" id="b-retry">Retry Level</button>
+    <button class="btn ghost" id="b-over-levels">Levels</button>
+    <button class="btn ghost" id="b-over-hangar">Hangar</button>
+    <button class="btn ghost" id="b-over-menu">Main Menu</button>
   </div>
 </div>
 
@@ -441,22 +484,22 @@ const JETS = {
             speed:0.5, fire:0.95, health:1.0, handling:0.5 },
   phantom:{ name:"Phantom X", role:"Beam Prototype", price:17000, shape:"stealth", detail:4, color:0x7b4bff, accent:0x00f0ff, cockpit:0x00f0ff, glow:0x00f0ff,
             speed:0.92, fire:0.85, health:0.7, handling:0.9,
-            special:{ id:"laser", name:"Laser Lance", icon:"⚡", cd:6 } },
+            special:{ id:"laser", name:"Laser Lance", icon:"LSR", cd:6 } },
   valkyrie:{name:"Valkyrie", role:"Drone Carrier", price:21000, shape:"twin",    detail:4, color:0xf5f0ff, accent:0xffc857, cockpit:0x66e0ff, glow:0xffc857,
             speed:0.8, fire:0.8, health:0.85, handling:0.78,
-            special:{ id:"drones", name:"Drone Swarm", icon:"✦", cd:12 } },
+            special:{ id:"drones", name:"Drone Swarm", icon:"DRN", cd:12 } },
   aegis:  { name:"Aegis Prime", role:"Apex Interceptor", price:27000, shape:"delta", detail:4, color:0xffe27a, accent:0x39b6ff, cockpit:0xffffff, glow:0x39b6ff,
             speed:0.95, fire:0.95, health:0.95, handling:0.92,
-            special:{ id:"emp", name:"EMP Nova", icon:"❋", cd:14 } },
+            special:{ id:"emp", name:"EMP Nova", icon:"EMP", cd:14 } },
 };
 const JET_ORDER = ["scout","inter","heavy","harrier","cyclone","vanguard","tempest","nighthawk","marauder","colossus","phantom","valkyrie","aegis"];
 
 // ---- 4-level campaign; difficulty & boss-entrance delay climb per level ----
 const LEVELS = [
-  { n:1, name:"Sky Islands",   sub:"Floating archipelago patrol",    diff:1.0,  bossDelay:2.5, boss:"DREADNOUGHT" },
-  { n:2, name:"Storm Front",   sub:"Break the Warlord's blockade",   diff:1.4,  bossDelay:3.5, boss:"WARLORD MK II" },
-  { n:3, name:"Ashen Reach",   sub:"Run the volcanic no-fly zone",   diff:1.85, bossDelay:4.5, boss:"OBLIVION" },
-  { n:4, name:"The Void Gate", sub:"Final assault on the Sovereign", diff:2.4,  bossDelay:6.0, boss:"VOID SOVEREIGN" },
+  { n:1, name:"Sky Islands",   sub:"Floating archipelago patrol",    diff:1.0,  bossDelay:8.0,  boss:"DREADNOUGHT" },
+  { n:2, name:"Storm Front",   sub:"Break the Warlord's blockade",   diff:1.4,  bossDelay:10.0, boss:"WARLORD MK II" },
+  { n:3, name:"Ashen Reach",   sub:"Run the volcanic no-fly zone",   diff:1.85, bossDelay:14.0, boss:"OBLIVION" },
+  { n:4, name:"The Void Gate", sub:"Final assault on the Sovereign", diff:2.4,  bossDelay:18.0, boss:"VOID SOVEREIGN" },
 ];
 
 /* ------------------------------ AUDIO (tiny synth) ------------------------ */
@@ -499,8 +542,8 @@ const Sound = (()=>{
 
 /* ------------------------------ THREE SETUP ------------------------------- */
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x8fd0f5);
-scene.fog = new THREE.Fog(0xbfe6ff, 60, 240);
+scene.background = new THREE.Color(0x0a0e1f);
+scene.fog = new THREE.Fog(0x0d1535, 60, 240);
 
 const camera = new THREE.PerspectiveCamera(62, innerWidth/innerHeight, 0.1, 500);
 const renderer = new THREE.WebGLRenderer({ antialias:true });
@@ -510,14 +553,76 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.getElementById("game").appendChild(renderer.domElement);
 
-const sun = new THREE.DirectionalLight(0xffffff, 1.05);
+const sun = new THREE.DirectionalLight(0x88ccff, 1.1);
 sun.position.set(30, 60, 20); sun.castShadow = true;
 sun.shadow.mapSize.set(1024,1024);
 sun.shadow.camera.near=1; sun.shadow.camera.far=200;
 sun.shadow.camera.left=-70; sun.shadow.camera.right=70; sun.shadow.camera.top=70; sun.shadow.camera.bottom=-70;
 scene.add(sun);
-scene.add(new THREE.HemisphereLight(0xcfeaff, 0x4a6b3a, 0.85));
-scene.add(new THREE.AmbientLight(0xffffff, 0.25));
+const hemiLight = new THREE.HemisphereLight(0x1a3a6e, 0x0a0020, 0.9);
+scene.add(hemiLight);
+const ambLight = new THREE.AmbientLight(0x223355, 0.3);
+scene.add(ambLight);
+
+/* ------------------------------ LEVEL THEMES ------------------------------- */
+const THEMES = {
+  1: { // Neon Dawn — Electric deep-blue sci-fi sky
+    bg: 0x0a0e1f, fog: 0x0d1535, fogNear:60, fogFar:220,
+    sun: 0x88ccff, sunInt:1.1,
+    hemiSky: 0x1a3a6e, hemiGnd: 0x0a0020, hemiInt:0.9,
+    amb: 0x223355, ambInt:0.3,
+    sunDiscColor: 0x44aaff, sunGlowColor: 0x1144aa,
+    cssInk:'#0a0e2a', cssPanelBg:'rgba(8,14,38,.85)', cssBorder:'rgba(0,180,255,.18)',
+    envType:'dawn'
+  },
+  2: { // Thunder Surge — Dark electric storm, indigo charged sky
+    bg: 0x080614, fog: 0x14103a, fogNear:40, fogFar:180,
+    sun: 0xccaaff, sunInt:0.8,
+    hemiSky: 0x2a1660, hemiGnd: 0x060410, hemiInt:1.0,
+    amb: 0x1a0a40, ambInt:0.4,
+    sunDiscColor: 0x9955ff, sunGlowColor: 0x44006a,
+    cssInk:'#08061a', cssPanelBg:'rgba(14,8,45,.88)', cssBorder:'rgba(160,80,255,.22)',
+    envType:'storm'
+  },
+  3: { // Molten Inferno — Volcanic dusk, ash & lava glow
+    bg: 0x100402, fog: 0x2a0a00, fogNear:35, fogFar:160,
+    sun: 0xff8844, sunInt:1.2,
+    hemiSky: 0x4a1800, hemiGnd: 0x0a0200, hemiInt:1.1,
+    amb: 0x300a00, ambInt:0.5,
+    sunDiscColor: 0xff4400, sunGlowColor: 0x8b1a00,
+    cssInk:'#120400', cssPanelBg:'rgba(30,8,0,.88)', cssBorder:'rgba(255,80,0,.22)',
+    envType:'lava'
+  },
+  4: { // Deep Void — Pure deep space, magenta neon asteroid belt
+    bg: 0x02010a, fog: 0x080020, fogNear:55, fogFar:200,
+    sun: 0xff44aa, sunInt:0.9,
+    hemiSky: 0x1a0030, hemiGnd: 0x000008, hemiInt:0.8,
+    amb: 0x0a0018, ambInt:0.25,
+    sunDiscColor: 0xcc00ff, sunGlowColor: 0x44004a,
+    cssInk:'#020008', cssPanelBg:'rgba(10,0,28,.90)', cssBorder:'rgba(200,0,255,.22)',
+    envType:'void'
+  }
+};
+
+function applyTheme(level){
+  const t = THEMES[level] || THEMES[1];
+  scene.background.setHex(t.bg);
+  scene.fog.color.setHex(t.fog);
+  scene.fog.near = t.fogNear; scene.fog.far = t.fogFar;
+  sun.color.setHex(t.sun); sun.intensity = t.sunInt;
+  hemiLight.color.setHex(t.hemiSky); hemiLight.groundColor.setHex(t.hemiGnd); hemiLight.intensity = t.hemiInt;
+  ambLight.color.setHex(t.amb); ambLight.intensity = t.ambInt;
+  sunDisc.material.color.setHex(t.sunDiscColor);
+  sunGlow.material.color.setHex(t.sunGlowColor);
+  // update CSS variables on the game container for HUD
+  const root = document.documentElement;
+  root.style.setProperty('--theme-ink', t.cssInk);
+  root.style.setProperty('--theme-panel', t.cssPanelBg);
+  root.style.setProperty('--theme-border', t.cssBorder);
+  // clear and repopulate environment objects for new theme
+  envPool.forEach(o=>world.remove(o.mesh)); envPool.length=0;
+  for(let z=-30; z>-300; z-=Math.random()*16+10) spawnEnv(z);
+}
 
 const baseFov = 62;
 let lastWidth = 0;
@@ -659,6 +764,33 @@ function buildFighter(){
   vox(g,[0,0.5,-0.3],[0.9,0.5,1.0],0x1a1a2a,{emissive:0x220033});
   g.scale.setScalar(0.62); return g;
 }
+// --- NEW: Bomber — slow heavy armoured ship that drops bombs ---
+function buildBomber(){
+  const g=new THREE.Group();
+  vox(g,[0,0,0],[2.6,1.6,4.8],0x4a3010);    // heavy dark hull
+  vox(g,[0,-0.7,0.6],[2.0,0.6,2.8],0x2a1a08);  // bomb bay undercarriage
+  vox(g,[0,-0.9,0.4],[1.2,0.5,1.8],0xff2200,{emissive:0x881100}); // bomb bay glow
+  vox(g,[3.0,0,0.8],[3.6,0.4,2.4],0x3a2408);  // thick wings
+  vox(g,[-3.0,0,0.8],[3.6,0.4,2.4],0x3a2408);
+  vox(g,[3.8,0,0.8],[0.5,0.4,1.4],0xff6600,{emissive:0x552200}); // engine nacelle
+  vox(g,[-3.8,0,0.8],[0.5,0.4,1.4],0xff6600,{emissive:0x552200});
+  vox(g,[0,0.6,0.4],[1.0,0.8,1.6],0x222233,{emissive:0x110011}); // cockpit
+  vox(g,[0,0.9,2.4],[0.5,1.2,0.9],0x3a2408);  // tail fin
+  g.scale.setScalar(0.68); return g;
+}
+// --- NEW: Gunship — medium, rapid dual-fire, aggressive tracker ---
+function buildGunship(){
+  const g=new THREE.Group();
+  vox(g,[0,0,0],[2.2,1.4,3.8],0x1a3a1a);    // dark green-grey hull
+  vox(g,[0,0,-2.4],[1.0,0.8,1.4],0x2a5a2a);
+  vox(g,[2.4,0,0.2],[2.8,0.38,1.6],0x0f2a0f); // swept wings
+  vox(g,[-2.4,0,0.2],[2.8,0.38,1.6],0x0f2a0f);
+  vox(g,[1.8,-0.3,-0.8],[0.45,0.45,1.8],0x00ff44,{emissive:0x004422}); // dual cannons
+  vox(g,[-1.8,-0.3,-0.8],[0.45,0.45,1.8],0x00ff44,{emissive:0x004422});
+  vox(g,[0,0.5,0.4],[0.9,0.6,1.2],0x111a11,{emissive:0x002200}); // cockpit
+  vox(g,[0,0.8,1.8],[0.4,1.0,0.8],0x0f2a0f);  // tail
+  g.scale.setScalar(0.64); return g;
+}
 function buildBoss(){
   const g=new THREE.Group();
   vox(g,[0,0,0],[7,3.2,9],0x455a64);
@@ -741,84 +873,160 @@ function buildBoss2(){
 
 /* ------------------------------ ENVIRONMENT ------------------------------- */
 const world = new THREE.Group(); scene.add(world);  // scrolling props live here
-const sunDisc=new THREE.Mesh(new THREE.CircleGeometry(34,28), new THREE.MeshBasicMaterial({color:0xfff2c0,transparent:true,opacity:0.85}));
+const sunDisc=new THREE.Mesh(new THREE.CircleGeometry(34,28), new THREE.MeshBasicMaterial({color:0x44aaff,transparent:true,opacity:0.75}));
 sunDisc.position.set(-70,64,-260); scene.add(sunDisc);
-const sunGlow=new THREE.Mesh(new THREE.CircleGeometry(52,28), new THREE.MeshBasicMaterial({color:0xffe8a0,transparent:true,opacity:0.28}));
+const sunGlow=new THREE.Mesh(new THREE.CircleGeometry(60,28), new THREE.MeshBasicMaterial({color:0x1144aa,transparent:true,opacity:0.22}));
 sunGlow.position.set(-70,64,-262); scene.add(sunGlow);
+
+/* -- L1: Neon Dawn island (neon-tinted, electric) -- */
 function buildIsland(){
   const g=new THREE.Group();
   const w=6+Math.random()*12, d=6+Math.random()*12;
-  const greens=[0x7cbf4a,0x69b03e,0x8fd15a,0x5fa838];
-  const grass=greens[(Math.random()*greens.length)|0];
-  vox(g,[0,0,0],[w,2.2,d],grass,{shadow:false});
-  vox(g,[0,1.15,0],[w*0.96,0.3,d*0.96],0x9be060,{shadow:false});          // grassy rim
-  vox(g,[0,-2.2,0],[w*0.8,3.4,d*0.8],0x9c6b3f,{shadow:false});
-  vox(g,[0,-4.6,0],[w*0.5,3.6,d*0.5],0x7a5230,{shadow:false});
-  vox(g,[0,-7.0,0],[w*0.26,3,d*0.26],0x5f3f24,{shadow:false});             // rocky point
-  if(Math.random()<0.4){                                                   // waterfall
-    const wx=(Math.random()-0.5)*w*0.5;
-    vox(g,[wx,-2,d*0.48],[1.4,6,0.5],0x6fd0ff,{opacity:0.6,shadow:false,emissive:0x1a4a6a});
-    vox(g,[wx,1.1,d*0.48],[1.8,0.4,0.6],0x9be8ff,{shadow:false});
-  }
-  const props=2+(Math.random()*4|0);
+  const blues=[0x0d4a8a,0x0e3f70,0x165caa];
+  const top=blues[(Math.random()*blues.length)|0];
+  vox(g,[0,0,0],[w,2.2,d],top,{shadow:false});
+  vox(g,[0,1.15,0],[w*0.96,0.3,d*0.96],0x1a6ec8,{shadow:false});
+  vox(g,[0,-2.2,0],[w*0.8,3.4,d*0.8],0x0a2a50,{shadow:false});
+  vox(g,[0,-4.6,0],[w*0.5,3.6,d*0.5],0x071e3a,{shadow:false});
+  vox(g,[0,-7.0,0],[w*0.26,3,d*0.26],0x040f20,{shadow:false});
+  // neon antenna spires instead of trees
+  const props=2+(Math.random()*3|0);
   for(let i=0;i<props;i++){
-    const px=(Math.random()-0.5)*w*0.7, pz=(Math.random()-0.5)*d*0.7, r=Math.random();
-    if(r<0.4){ // varied tree
-      const th=1.2+Math.random()*1.2, cc=[0x4e9c3a,0x3f8a30,0x5cb046][(Math.random()*3)|0];
-      vox(g,[px,1.1+th/2,pz],[0.6,th,0.6],0x6b4324,{shadow:false});
-      vox(g,[px,1.1+th+0.9,pz],[2.0,2.0,2.0],cc,{shadow:false});
-      vox(g,[px,1.1+th+2.1,pz],[1.2,1.2,1.2],cc,{shadow:false});
-    } else if(r<0.62){ // hut
-      vox(g,[px,1.9,pz],[1.8,1.6,1.8],0xd9c27a,{shadow:false});
-      vox(g,[px,3.0,pz],[2.1,0.7,2.1],0xb5462f,{shadow:false});
-    } else if(r<0.8){ // rock cluster
-      vox(g,[px,1.6,pz],[1.4,1.4,1.4],0x9aa4ad,{shadow:false});
-      vox(g,[px+0.6,1.2,pz+0.4],[0.9,0.9,0.9],0x828d96,{shadow:false});
-    } else { // lighthouse
-      vox(g,[px,2.2,pz],[1.0,3.0,1.0],0xecf0f3,{shadow:false});
-      vox(g,[px,3.6,pz],[1.0,0.8,1.0],0xff5b6e,{shadow:false});
-      vox(g,[px,4.2,pz],[0.7,0.5,0.7],0xffe27a,{shadow:false,emissive:0xffd24a});
-    }
+    const px=(Math.random()-0.5)*w*0.7, pz=(Math.random()-0.5)*d*0.7;
+    const gc=[0x00f0c8,0x44aaff,0xff44cc][(Math.random()*3)|0];
+    vox(g,[px,1.4,pz],[0.35,2.5+Math.random()*2,0.35],0x334466,{shadow:false});
+    vox(g,[px,3.8+Math.random(),pz],[0.8,0.8,0.8],gc,{shadow:false,emissive:gc});
   }
   return g;
 }
-function buildSpire(){
-  const g=new THREE.Group();
-  const h=14+Math.random()*16, rock=[0x8a7f72,0x9c8b78,0x776a5c][(Math.random()*3)|0];
-  for(let i=0;i<5;i++){ const s=6-i*1.0; vox(g,[(Math.random()-0.5)*2,-i*(h/6),0],[s,h/5,s],rock,{shadow:false}); }
-  vox(g,[0,h*0.14,0],[5,1.6,5],0x7cbf4a,{shadow:false});                    // grass cap
-  if(Math.random()<0.5){ vox(g,[0,h*0.14+1.6,0],[0.6,1.4,0.6],0x6b4324,{shadow:false}); vox(g,[0,h*0.14+2.8,0],[2,2,2],0x4e9c3a,{shadow:false}); }
-  return g;
-}
-function buildBirds(){
-  const g=new THREE.Group(); const n=3+(Math.random()*4|0);
-  for(let i=0;i<n;i++){ const bx=(Math.random()-0.5)*10, by=(Math.random()-0.5)*4;
-    vox(g,[bx,by,0],[0.6,0.16,0.16],0x37343a,{shadow:false});
-    vox(g,[bx+0.5,by+0.22,0],[0.5,0.14,0.14],0x37343a,{shadow:false});
-    vox(g,[bx-0.5,by+0.22,0],[0.5,0.14,0.14],0x37343a,{shadow:false}); }
-  g.userData.birds=true; return g;
-}
+/* -- L1: Glowing neon cloud puffs -- */
 function buildCloud(){
   const g=new THREE.Group();
   const puffs=3+(Math.random()*4|0);
+  const cols=[0x1a3a70,0x0d2a5a,0x0a1f4a];
   for(let i=0;i<puffs;i++){
-    const s=2+Math.random()*3.5;
-    vox(g,[(Math.random()-0.5)*8,(Math.random()-0.5)*2,(Math.random()-0.5)*6],[s,s*0.7,s],0xffffff,{shadow:false,opacity:0.92});
+    const s=2+Math.random()*3.5, c=cols[(Math.random()*cols.length)|0];
+    vox(g,[(Math.random()-0.5)*8,(Math.random()-0.5)*2,(Math.random()-0.5)*6],[s,s*0.7,s],c,{shadow:false,opacity:0.82});
   }
   return g;
 }
+/* -- L1: Crystal spire (neon-lit) -- */
+function buildSpire(){
+  const g=new THREE.Group();
+  const h=14+Math.random()*16;
+  const rock=[0x0a2040,0x0c2a50,0x081830][(Math.random()*3)|0];
+  for(let i=0;i<5;i++){ const s=6-i*1.0; vox(g,[(Math.random()-0.5)*2,-i*(h/6),0],[s,h/5,s],rock,{shadow:false}); }
+  const gc=[0x00f0c8,0x44aaff][(Math.random()*2)|0];
+  vox(g,[0,h*0.14,0],[4,2.0,4],gc,{shadow:false,emissive:gc});  // glowing crystal cap
+  return g;
+}
+/* -- L1: Flying debris / satellites -- */
+function buildBirds(){
+  const g=new THREE.Group(); const n=3+(Math.random()*4|0);
+  for(let i=0;i<n;i++){ const bx=(Math.random()-0.5)*10, by=(Math.random()-0.5)*4;
+    vox(g,[bx,by,0],[0.8,0.18,0.6],0x334466,{shadow:false});
+    vox(g,[bx+0.6,by,0],[0.4,0.12,0.4],0x00f0c8,{shadow:false,emissive:0x00f0c8}); }
+  g.userData.birds=true; return g;
+}
+
+/* -- L2: Storm cloud (dark electric purple) -- */
+function buildStormCloud(){
+  const g=new THREE.Group();
+  const puffs=4+(Math.random()*4|0);
+  const cols=[0x1a0a40,0x2a1060,0x0e0628];
+  for(let i=0;i<puffs;i++){
+    const s=3+Math.random()*5, c=cols[(Math.random()*cols.length)|0];
+    vox(g,[(Math.random()-0.5)*10,(Math.random()-0.5)*3,(Math.random()-0.5)*8],[s,s*0.65,s],c,{shadow:false,opacity:0.9});
+  }
+  // lightning streak accent
+  if(Math.random()<0.5) vox(g,[(Math.random()-0.5)*6,-2,0],[0.25,4,0.25],0xddaaff,{shadow:false,emissive:0xcc88ff,opacity:0.7});
+  return g;
+}
+/* -- L2: Ruined storm tower -- */
+function buildStormTower(){
+  const g=new THREE.Group();
+  const h=10+Math.random()*14;
+  const dark=[0x18092e,0x200a3a,0x120624][(Math.random()*3)|0];
+  for(let i=0;i<4;i++){ const s=4-i*0.7; vox(g,[0,-i*(h/4),0],[s,h/4,s],dark,{shadow:false}); }
+  vox(g,[0,h*0.1,0],[3,1.4,3],0x9955ff,{shadow:false,emissive:0x7733dd});
+  return g;
+}
+
+/* -- L3: Lava spire (volcanic) -- */
+function buildLavaSpire(){
+  const g=new THREE.Group();
+  const h=12+Math.random()*18;
+  const obsidian=[0x1a0800,0x220a00,0x100400][(Math.random()*3)|0];
+  for(let i=0;i<5;i++){ const s=7-i*1.2; vox(g,[(Math.random()-0.5)*1.5,-i*(h/5),0],[s,h/5,s],obsidian,{shadow:false}); }
+  // lava cracks glow
+  vox(g,[0,h*0.1,0],[4,1.2,4],0xff4400,{shadow:false,emissive:0xdd2200,opacity:0.9});
+  vox(g,[1.5,h*0.08,0.8],[1,0.6,1],0xff8800,{shadow:false,emissive:0xff6600});
+  return g;
+}
+/* -- L3: Ash cloud -- */
+function buildAshCloud(){
+  const g=new THREE.Group();
+  const puffs=3+(Math.random()*5|0);
+  const cols=[0x2a1200,0x3a1800,0x1c0a00];
+  for(let i=0;i<puffs;i++){
+    const s=2.5+Math.random()*4.5, c=cols[(Math.random()*cols.length)|0];
+    vox(g,[(Math.random()-0.5)*9,(Math.random()-0.5)*2.5,(Math.random()-0.5)*7],[s,s*0.6,s],c,{shadow:false,opacity:0.88});
+  }
+  return g;
+}
+
+/* -- L4: Void asteroid (tumbling rocky chunk) -- */
+function buildAsteroid(){
+  const g=new THREE.Group();
+  const sz=3+Math.random()*6;
+  const rocks=[0x0a0018,0x14002a,0x08001a];
+  const c=rocks[(Math.random()*rocks.length)|0];
+  vox(g,[0,0,0],[sz,sz*0.8,sz],c,{shadow:false});
+  vox(g,[sz*0.3,sz*0.3,0],[sz*0.5,sz*0.5,sz*0.5],0x180030,{shadow:false});
+  // neon vein
+  const gc=[0xcc00ff,0xff44aa,0x8800ff][(Math.random()*3)|0];
+  vox(g,[(Math.random()-0.5)*sz*0.5,sz*0.2,0],[0.4,sz*0.6,0.4],gc,{shadow:false,emissive:gc,opacity:0.9});
+  g.userData.tumble=true;
+  return g;
+}
+/* -- L4: Void debris (broken neon city block) -- */
+function buildVoidDebris(){
+  const g=new THREE.Group();
+  const w=4+Math.random()*8, h=4+Math.random()*8;
+  vox(g,[0,0,0],[w,h,3],0x06001a,{shadow:false});
+  // glowing window strips
+  const gc=[0xff00cc,0x8800ff,0x00ccff][(Math.random()*3)|0];
+  for(let row=0;row<3;row++){
+    vox(g,[0,-h*0.2+row*h*0.25,1.55],[w*0.8,0.5,0.3],gc,{shadow:false,emissive:gc,opacity:0.85});
+  }
+  g.userData.tumble=true;
+  return g;
+}
+
 const envPool=[]; // {mesh,bird,bob}
+let currentEnvType='dawn';
 function spawnEnv(z){
   const r=Math.random(); let mesh,y;
-  if(r<0.32){ mesh=buildIsland(); y=-14-Math.random()*16; }
-  else if(r<0.44){ mesh=buildSpire(); y=-20-Math.random()*10; }
-  else if(r<0.56){ mesh=buildBirds(); y=4+Math.random()*16; }
-  else { mesh=buildCloud(); y=-6+Math.random()*26; }
+  if(currentEnvType==='storm'){
+    if(r<0.5){ mesh=buildStormCloud(); y=-4+Math.random()*22; }
+    else { mesh=buildStormTower(); y=-22-Math.random()*12; }
+  } else if(currentEnvType==='lava'){
+    if(r<0.55){ mesh=buildAshCloud(); y=-2+Math.random()*18; }
+    else { mesh=buildLavaSpire(); y=-20-Math.random()*14; }
+  } else if(currentEnvType==='void'){
+    if(r<0.5){ mesh=buildAsteroid(); y=-18+Math.random()*32; }
+    else { mesh=buildVoidDebris(); y=-16+Math.random()*28; }
+  } else { // dawn (L1)
+    if(r<0.32){ mesh=buildIsland(); y=-14-Math.random()*16; }
+    else if(r<0.50){ mesh=buildSpire(); y=-20-Math.random()*10; }
+    else if(r<0.64){ mesh=buildBirds(); y=4+Math.random()*16; }
+    else { mesh=buildCloud(); y=-6+Math.random()*26; }
+  }
   mesh.position.set((Math.random()-0.5)*130, y, z);
   mesh.rotation.y=Math.random()*6;
-  world.add(mesh); envPool.push({mesh, bird:!!mesh.userData.birds, bob:Math.random()*6});
+  world.add(mesh); envPool.push({mesh, bird:!!mesh.userData.birds, bob:Math.random()*6, tumble:!!mesh.userData.tumble});
 }
-// prime environment
+// prime environment (L1 default)
 for(let z=-30; z>-300; z-=Math.random()*16+10) spawnEnv(z);
 
 /* --------------------------- OBJECT POOLS / FX ---------------------------- */
@@ -923,8 +1131,215 @@ function spawnHealth(pos){
 }
 
 /* ============================================================================
-   PLAYER
+   SCRAP FORGE SYSTEM
    ========================================================================== */
+const UPGRADE_POOL = [
+  {id:"wing_cannon", icon:"🔫", name:"Wing Cannons",   desc:"Two extra muzzles fire on your wingtips"},
+  {id:"rear_gun",    icon:"↩", name:"Tail Gunner",    desc:"Auto-cannon fires backwards at chasers"},
+  {id:"rapid_ex",   icon:"⚡", name:"Hyperfeed",      desc:"Permanent fire rate +50%"},
+  {id:"spread_ex",  icon:"✳", name:"Spread Shot+",   desc:"All shots become a 5-bullet spread"},
+  {id:"magnet",     icon:"◉", name:"Gravity Well",   desc:"Scrap & coin attract radius x3"},
+  {id:"repair_nano",icon:"+",  name:"Nano Repair",   desc:"Restore 35% Hull immediately"},
+  {id:"armor_plate",icon:"▣",  name:"Alloy Armor",   desc:"Max hull +25% permanently"},
+  {id:"homing",     icon:"⟳", name:"Lock-On Pods",  desc:"30% of shots home onto nearest enemy"},
+  {id:"emp_ring",   icon:"◌", name:"EMP Ring",       desc:"Every 15 kills triggers an EMP nova"},
+  {id:"overdrive",  icon:"▲", name:"Overdrive",      desc:"Move speed +25%, larger thruster glow"},
+  {id:"double_scrap",icon:"◆",name:"Salvager",       desc:"Scrap drops x2 from all enemies"},
+  {id:"arc_bolt",   icon:"~", name:"Arc Bolt",       desc:"Bullets chain to 1 nearby enemy on hit"},
+  {id:"coin_gun",   icon:"○", name:"Coin Magnet",    desc:"Collect all coins on screen now & always"},
+  {id:"barrier",    icon:"□", name:"Barrier Wall",   desc:"Four shield fragments orbit your jet"},
+  {id:"burst_fire", icon:"≡", name:"Burst Fire",     desc:"Each trigger fires a 3-round burst"},
+];
+
+const Forge = {
+  scrap: 0,
+  scrapMax: 40,       // scrap needed to level up
+  level: 0,
+  active: {},         // active upgrade flags/values
+  upgradeMeshes: [],  // voxel meshes attached to jet
+  rearGunCd: 0,
+  empKillCount: 0,
+  barrierMeshes: [],
+  barrierAngle: 0,
+
+  reset(){
+    this.scrap=0; this.level=0; this.active={}; this.rearGunCd=0; this.empKillCount=0; this.barrierAngle=0;
+    this.upgradeMeshes.forEach(m=>Player.group.remove(m)); this.upgradeMeshes=[];
+    this.barrierMeshes.forEach(m=>scene.remove(m)); this.barrierMeshes=[];
+    document.getElementById('forge-fill').style.width='0%';
+    document.getElementById('forge-bar-wrap').classList.add('on');
+    document.getElementById('forge-cards').classList.remove('on');
+  },
+
+  addScrap(n){
+    const amount = (this.active.double_scrap ? n*2 : n);
+    this.scrap = Math.min(this.scrapMax, this.scrap + amount);
+    this.updateBar();
+    if(this.scrap >= this.scrapMax){ this.scrap=0; this.updateBar(); this.level++; showUpgradeCards(); }
+  },
+
+  updateBar(){
+    document.getElementById('forge-fill').style.width = (this.scrap/this.scrapMax*100)+'%';
+  },
+
+  update(dt){
+    // rear gun fires backward
+    if(this.active.rear_gun){
+      this.rearGunCd -= dt;
+      if(this.rearGunCd <= 0){
+        this.rearGunCd = 0.55;
+        const pos = Player.group.position.clone().add(new THREE.Vector3(0,0,1.8));
+        fireEnemyBulletFriendly(pos, new THREE.Vector3(0,0,1).normalize(), 12);
+      }
+    }
+    // barrier orbit
+    if(this.barrierMeshes.length){
+      this.barrierAngle += dt*1.8;
+      this.barrierMeshes.forEach((m,i)=>{
+        const a = this.barrierAngle + i*(Math.PI/2);
+        m.position.set(Player.group.position.x+Math.cos(a)*4, Player.group.position.y+Math.sin(a)*2.5, 0.2);
+        m.rotation.y = a;
+      });
+    }
+  }
+};
+
+// Friendly rear bullet (hits enemies only, not player)
+function fireEnemyBulletFriendly(pos, dir, dmg){
+  const b=new THREE.Mesh(bulletGeo, new THREE.MeshBasicMaterial({color:0x00f0c8}));
+  b.position.copy(pos);
+  b.userData={vel:dir.clone().multiplyScalar(90), dmg, life:2, age:0, friendly:true};
+  scene.add(b); pBullets.push(b);
+}
+
+const scraps=[]; // active scrap pieces in scene
+const scrapGeo=new THREE.BoxGeometry(0.6,0.6,0.6);
+const scrapMat=new THREE.MeshBasicMaterial({color:0x00f0c8, transparent:true, opacity:0.9, blending:THREE.AdditiveBlending, depthWrite:false});
+function spawnScrap(pos, count){
+  for(let i=0;i<count;i++){
+    const s=new THREE.Mesh(scrapGeo, scrapMat.clone());
+    s.position.copy(pos);
+    s.position.x+=(Math.random()-0.5)*3; s.position.y+=(Math.random()-0.5)*3;
+    s.userData={vx:(Math.random()-0.5)*5, vy:(Math.random()-0.5)*5, age:0};
+    scene.add(s); scraps.push(s);
+  }
+}
+function updateScrap(dt){
+  const pp=Player.group.position;
+  const range = Forge.active.magnet ? 36 : 14;
+  for(let i=scraps.length-1;i>=0;i--){
+    const s=scraps[i]; s.userData.age+=dt;
+    s.rotation.y+=dt*4; s.rotation.x+=dt*3;
+    // scroll with the world so they stay in the player's lane
+    s.position.z += LEVEL_SPEED*dt;
+    s.userData.vx*=0.94; s.userData.vy*=0.94;
+    s.position.x+=s.userData.vx*dt; s.position.y+=s.userData.vy*dt;
+    const d=s.position.distanceTo(pp);
+    if(d<range) s.position.lerp(pp, Math.min(1, dt*(5+(range-d)*0.8)));
+    if(d<2.2){ Forge.addScrap(1); scene.remove(s); scraps.splice(i,1); continue; }
+    if(s.userData.age>8||s.position.z>18){ scene.remove(s); scraps.splice(i,1); }
+  }
+}
+
+function showUpgradeCards(){
+  State.running=false;
+  // pick 3 unique random upgrades the player doesn't already have
+  const pool=UPGRADE_POOL.filter(u=>!Forge.active[u.id] || u.id==='repair_nano');
+  const chosen=[];
+  while(chosen.length<3 && pool.length>0){
+    const idx=(Math.random()*pool.length)|0;
+    chosen.push(pool.splice(idx,1)[0]);
+  }
+  const row=document.getElementById('cards-row');
+  row.innerHTML='';
+  chosen.forEach(u=>{
+    const card=document.createElement('div');
+    card.className='upg-card';
+    card.innerHTML=`<div class="upg-icon">${u.icon}</div><div class="upg-name">${u.name}</div><div class="upg-desc">${u.desc}</div>`;
+    card.onclick=()=>applyUpgrade(u);
+    row.appendChild(card);
+  });
+  const fc=document.getElementById('forge-cards');
+  fc.classList.add('on');
+  // trigger the stagger animation on next frame
+  requestAnimationFrame(()=>requestAnimationFrame(()=>fc.classList.add('visible')));
+}
+function applyUpgrade(u){
+  const fc=document.getElementById('forge-cards');
+  fc.classList.remove('visible');
+  setTimeout(()=>{ fc.classList.remove('on'); },300);
+  setTimeout(()=>{ State.running=true; },320);
+  Forge.active[u.id]=true;
+  Sound.power();
+  HUD.showToast(u.name.toUpperCase()+' ACQUIRED!');
+  // --- Apply effects ---
+  if(u.id==='repair_nano'){
+    Player.hp=Math.min(Player.maxhp, Player.hp+Math.round(Player.maxhp*0.35));
+    HUD.updateHealth(); Forge.active.repair_nano=false;
+  }
+  if(u.id==='armor_plate'){
+    Player.maxhp=Math.round(Player.maxhp*1.25);
+    Player.hp=Math.min(Player.maxhp, Player.hp+Math.round(Player.maxhp*0.1));
+    HUD.updateHealth();
+  }
+  if(u.id==='overdrive'){
+    // handled in Player.update via Forge.active check
+  }
+  if(u.id==='coin_gun'){
+    // instantly collect all coins
+    coins.forEach(c=>{ State.coins++; scene.remove(c); }); coins.length=0;
+    HUD.updateCoins();
+  }
+  if(u.id==='barrier'){
+    Forge.barrierMeshes.forEach(m=>scene.remove(m)); Forge.barrierMeshes=[];
+    for(let i=0;i<4;i++){
+      const bm=new THREE.Mesh(new THREE.BoxGeometry(1.4,1.4,0.3),
+        new THREE.MeshBasicMaterial({color:0x00f0c8, transparent:true, opacity:0.7, blending:THREE.AdditiveBlending}));
+      scene.add(bm); Forge.barrierMeshes.push(bm);
+    }
+  }
+  // --- Attach voxel mesh to jet ---
+  attachUpgradeMesh(u.id);
+}
+function attachUpgradeMesh(id){
+  if(!Player.jetMesh) return;
+  const g=new THREE.Group();
+  const gc=0x00f0c8;
+  if(id==='wing_cannon'){
+    for(const s of [1,-1]){
+      vox(g,[s*3.2,0,-0.8],[0.35,0.35,1.6],0x888899,{shadow:false});
+      vox(g,[s*3.2,0,-1.6],[0.5,0.5,0.4],gc,{shadow:false,emissive:gc});
+    }
+  } else if(id==='rear_gun'){
+    vox(g,[0,-0.2,2.2],[0.4,0.4,1.2],0x888899,{shadow:false});
+    vox(g,[0,-0.2,2.8],[0.6,0.6,0.4],gc,{shadow:false,emissive:gc});
+  } else if(id==='rapid_ex'){
+    vox(g,[0,0.35,-1.8],[0.25,0.25,1.4],gc,{shadow:false,emissive:gc});
+  } else if(id==='spread_ex'){
+    for(const s of [1,-1]) vox(g,[s*0.9,0.1,-1.5],[0.22,0.22,0.9],gc,{shadow:false,emissive:gc});
+  } else if(id==='magnet'){
+    vox(g,[0,1.0,0.5],[0.35,0.35,0.35],gc,{shadow:false,emissive:gc});
+    vox(g,[0,1.4,0.5],[0.6,0.6,0.1],gc,{shadow:false,emissive:gc,opacity:0.6});
+  } else if(id==='armor_plate'){
+    for(const s of [1,-1]) vox(g,[s*1.0,0,0.4],[0.25,1.2,1.4],0x556677,{shadow:false});
+  } else if(id==='homing'){
+    for(const s of [1,-1]) vox(g,[s*2.2,-0.5,0.2],[0.5,0.5,1.0],0xcc4400,{shadow:false,emissive:0x661100});
+  } else if(id==='emp_ring'){
+    vox(g,[0,-0.3,2.0],[1.8,0.18,1.8],gc,{shadow:false,emissive:gc,opacity:0.5});
+  } else if(id==='overdrive'){
+    for(const s of [1,-1]) vox(g,[s*0.5,-0.4,2.8],[0.5,0.5,0.6],gc,{shadow:false,emissive:gc});
+  } else if(id==='double_scrap'){
+    vox(g,[0,-0.6,0.6],[1.6,0.4,0.8],0x334455,{shadow:false});
+  } else if(id==='arc_bolt'){
+    vox(g,[0,0.2,-1.6],[0.5,0.5,0.5],gc,{shadow:false,emissive:gc});
+  } else if(id==='burst_fire'){
+    for(let i=0;i<3;i++) vox(g,[-0.5+i*0.5,0.25,-1.2],[0.2,0.2,0.7],gc,{shadow:false,emissive:gc,opacity:0.8});
+  }
+  if(g.children.length){
+    g.scale.setScalar(1/0.62); // undo jet scale
+    Player.jetMesh.add(g); Forge.upgradeMeshes.push(g);
+  }
+}
 const Player = {
   group:new THREE.Group(), jetMesh:null, def:null,
   hp:100, maxhp:100, shield:0, maxShield:0,
@@ -942,11 +1357,12 @@ const Player = {
     this.active={rapid:0,spread:0,shield:0}; this.shield=0;
     this.specialCd=0; this.specialLatch=false; this.clearDrones();
     this.group.position.set(0,2,0);
-    // trail meshes
+    // trail meshes (dynamic colors matching jet accent/glow)
     this.trailMeshes.forEach(m=>scene.remove(m)); this.trailMeshes=[];
+    const trailColor = this.def.glow || this.def.accent || 0x8fe0ff;
     for(let i=0;i<2;i++){
       const t=new THREE.Mesh(new THREE.ConeGeometry(0.5,3,6),
-        new THREE.MeshBasicMaterial({color:0x8fe0ff,transparent:true,opacity:0.7,blending:THREE.AdditiveBlending,depthWrite:false}));
+        new THREE.MeshBasicMaterial({color:trailColor,transparent:true,opacity:0.7,blending:THREE.AdditiveBlending,depthWrite:false}));
       t.rotation.x=-Math.PI/2; scene.add(t); this.trailMeshes.push(t);
     }
   },
@@ -972,7 +1388,7 @@ const Player = {
     this.jetMesh.position.y=Math.sin(performance.now()*0.004)*0.15;
     // timers
     ["rapid","spread","shield"].forEach(k=>{ if(this.active[k]>0){ this.active[k]-=dt; if(this.active[k]<=0)this.active[k]=0; }});
-    if(this.active.shield>0){ this.maxShield=60; this.shield=Math.min(60,this.shield); if(this.shield<=0)this.shield=60; }
+    if(this.active.shield>0){ this.maxShield=60; this.shield=Math.min(60,this.shield); if(this.shield<=0)this.shield=60; } else { this.shield=0; }
     if(this.invuln>0)this.invuln-=dt;
     // special ability (last-tier jets only)
     if(this.specialCd>0) this.specialCd-=dt;
@@ -993,30 +1409,54 @@ const Player = {
       });
       if(this.droneTime<=0) this.clearDrones();
     }
-    // firing
+    // firing — wing cannon adds extra muzzles if upgrade active
     this.fireCd-=dt;
     if(input.firing && this.fireCd<=0){
-      let rate = 0.16 - d.fire*0.06;           // base
+      let rate = 0.16 - d.fire*0.06;
       if(this.active.rapid>0) rate*=0.42;
+      if(Forge.active.rapid_ex) rate*=0.50;
       this.fireCd=rate;
       const dmg = 10+d.fire*14;
       const origin=this.group.position;
       const mz=this.jetMesh.userData.muzzles;
-      const spreadOn=this.active.spread>0;
-      const dirs = spreadOn ? [-0.14,0,0.14] : [0];
+      const spreadOn=this.active.spread>0 || Forge.active.spread_ex;
+      const dirs = spreadOn ? [-0.18,-0.09,0,0.09,0.18] : (Forge.active.burst_fire?[-0.06,0,0.06]:[0]);
       mz.forEach(m=>{
         const wp=m.clone().multiplyScalar(0.62).add(origin);
         spawnFlash(wp);
-        dirs.forEach(a=>firePlayerBullet(wp,new THREE.Vector3(Math.sin(a),0,-1).normalize(),dmg));
+        dirs.forEach(a=>{
+          const dir=new THREE.Vector3(Math.sin(a),0,-1).normalize();
+          // homing: nudge direction toward nearest enemy
+          if(Forge.active.homing && Math.random()<0.30 && enemies.length){
+            const ne=enemies.reduce((best,e)=>e.mesh.position.distanceTo(origin)<best.mesh.position.distanceTo(origin)?e:best,enemies[0]);
+            dir.lerp(new THREE.Vector3(ne.mesh.position.x-wp.x,ne.mesh.position.y-wp.y,ne.mesh.position.z-wp.z).normalize(),0.7);
+          }
+          firePlayerBullet(wp,dir,dmg);
+        });
       });
+      // wing cannon extra muzzles
+      if(Forge.active.wing_cannon){
+        const wm=[new THREE.Vector3(3.2,0,0),new THREE.Vector3(-3.2,0,0)];
+        wm.forEach(wmp=>{
+          const wp=wmp.clone().add(origin);
+          spawnFlash(wp);
+          firePlayerBullet(wp,new THREE.Vector3(0,0,-1),dmg*0.8);
+        });
+      }
       Sound.shoot();
     }
-    // trails
+    // trails & engine smoke particles
     const eng=this.jetMesh.userData.engines;
+    const trailColor = this.def.glow || this.def.accent || 0x8fe0ff;
     this.trailMeshes.forEach((t,i)=>{
       const p=eng[i].clone().multiplyScalar(0.62); p.add(this.group.position); p.z+=1.2;
-      t.position.copy(p); const pulse=0.7+Math.sin(performance.now()*0.02+i)*0.25;
-      t.material.opacity=pulse*0.7; t.scale.set(1,1+Math.abs(this.vx)*0.02,1);
+      t.position.copy(p);
+      const pulse=0.7+Math.sin(performance.now()*0.02+i)*0.25;
+      const scaleY=(1.0 + input.y*0.35)*pulse;
+      t.scale.set(1,scaleY,1);
+      if(Math.random()<0.25){
+        spawnThrusterSmoke(p, trailColor);
+      }
     });
   },
   damage(v){
@@ -1028,7 +1468,7 @@ const Player = {
   },
   givePower(type){
     Sound.power();
-    if(type.id==="shield"){ this.active.shield=8; this.shield=60; this.maxShield=60; }
+    if(type.id==="shield"){ this.active.shield=5; this.shield=60; this.maxShield=60; }
     else if(type.id==="health"){ this.hp=Math.min(this.maxhp, this.hp+Math.round(this.maxhp*0.35)); HUD.updateHealth(); }
     else this.active[type.id]=8;
     HUD.showToast(type.name.toUpperCase()+"!"); HUD.updatePowerups();
@@ -1085,11 +1525,16 @@ const enemies=[]; let boss=null;
 function makeEnemy(type,x,y,z){
   const diff=State.diff||1;
   let mesh,hp,speed,pattern;
-  if(type==="scout"){ mesh=buildScout(); hp=20; speed=26; pattern="dive"; }
-  else { mesh=buildFighter(); hp=45; speed=16; pattern="strafe"; }
+  if(type==="scout"){   mesh=buildScout();   hp=20;  speed=26; pattern="dive"; }
+  else if(type==="bomber"){ mesh=buildBomber(); hp=80;  speed=10; pattern="bomber"; }
+  else if(type==="gunship"){ mesh=buildGunship(); hp=60; speed=18; pattern="gunship"; }
+  else {                mesh=buildFighter(); hp=45;  speed=16; pattern="strafe"; }
   hp=Math.round(hp*diff); speed*=1+(diff-1)*0.35;
   mesh.position.set(x,y,z); mesh.rotation.y=Math.PI; scene.add(mesh);
-  const e={mesh,type,hp,maxhp:hp,speed,pattern,t:Math.random()*6,fireCd:(1+Math.random()*1.5)/(0.8+(diff-1)*0.3),hitFlash:0,baseX:x};
+  const e={mesh,type,hp,maxhp:hp,speed,pattern,t:Math.random()*6,
+    fireCd:(1+Math.random()*1.5)/(0.8+(diff-1)*0.3),
+    bombCd:3+Math.random()*2,
+    hitFlash:0,baseX:x};
   enemies.push(e); return e;
 }
 function updateEnemies(dt){
@@ -1099,8 +1544,38 @@ function updateEnemies(dt){
     if(e.pattern==="dive"){
       const toX=Player.x; m.position.x += (toX-m.position.x)*Math.min(1,dt*0.9);
       m.position.y += (Player.y-m.position.y)*Math.min(1,dt*0.6) + Math.sin(e.t*2)*dt*3;
-      m.position.y=Math.max(-5,Math.min(12,m.position.y));   // stay in reachable lane
+      m.position.y=Math.max(-5,Math.min(12,m.position.y));
       m.rotation.z=Math.sin(e.t*3)*0.3;
+    } else if(e.pattern==="bomber"){
+      // slow straight approach, weaves slightly, drops bombs on interval
+      m.position.x = e.baseX + Math.sin(e.t*0.5)*6;
+      m.position.y += (3-m.position.y)*Math.min(1,dt*0.3);
+      m.rotation.z=Math.sin(e.t*0.5)*0.15;
+      e.bombCd-=dt;
+      if(e.bombCd<=0 && m.position.z<-8 && m.position.z>-120){
+        e.bombCd=2.8+Math.random()*2;
+        // drop 2 bombs — spread in X around player
+        for(const bx of [-6+Math.random()*12, -6+Math.random()*12]){
+          const bdir=new THREE.Vector3(bx*0.05,0,0.8).normalize();
+          fireEnemyBullet(m.position.clone().add(new THREE.Vector3(bx*0.3,-0.8,0)),bdir,14);
+        }
+      }
+    } else if(e.pattern==="gunship"){
+      // aggressive tracker + rapid dual burst
+      const toX=Player.x; m.position.x += (toX-m.position.x)*Math.min(1,dt*1.4);
+      m.position.y += (Player.y-m.position.y)*Math.min(1,dt*0.8);
+      m.rotation.z=Math.cos(e.t*2)*0.2;
+      e.fireCd-=dt;
+      if(e.fireCd<=0 && m.position.z<-6 && m.position.z>-100){
+        e.fireCd=(0.6+Math.random()*0.5)/(0.8+((State.diff||1)-1)*0.3);
+        const p=m.position.clone();
+        // dual cannon burst — two shots offset
+        for(const ox of [1.8,-1.8]){
+          const sp=p.clone().add(new THREE.Vector3(ox*0.65,-0.3,0));
+          const dir=new THREE.Vector3(Player.x-sp.x, Player.y-sp.y, 0-sp.z).normalize();
+          fireEnemyBullet(sp,dir,11);
+        }
+      }
     } else { // strafe fighter
       m.position.x = e.baseX + Math.sin(e.t*1.2)*10;
       m.position.y += (Player.y-m.position.y)*Math.min(1,dt*0.4);
@@ -1113,14 +1588,14 @@ function updateEnemies(dt){
       }
     }
     if(e.hitFlash>0){ e.hitFlash-=dt; m.children.forEach(c=>c.material.emissive&&c.material.emissive.setScalar(e.hitFlash>0?0.6:0)); }
-    // collision with player — ram = big damage + both take it
+    // collision with player
     if(State.running && m.position.z>-6 && m.position.distanceTo(Player.group.position)<3.4){
-      Player.damage(e.type==="scout"?18:28);
-      const col=e.type==="scout"?0xff7043:0xab47bc;
+      const ramDmg = e.type==="scout"?18 : e.type==="bomber"?45 : e.type==="gunship"?30 : 28;
+      Player.damage(ramDmg);
+      const col=e.type==="scout"?0xff7043:e.type==="bomber"?0xff4400:e.type==="gunship"?0x44ff44:0xab47bc;
       spawnExplosion(m.position,col,10,1.2);
       scene.remove(m); enemies.splice(i,1); continue;
     }
-    // passed player
     if(m.position.z>14){ scene.remove(m); enemies.splice(i,1); continue; }
   }
 }
@@ -1129,16 +1604,26 @@ function hitEnemy(e,dmg,pos){
   e.mesh.children.forEach(c=>{ if(c.material.emissive) c.material.emissive.setScalar(0.6); });
   spawnHitSpark(pos);
   if(e.hp<=0){
-    const col=e.type==="scout"?0xff7043:0xab47bc;
-    spawnExplosion(e.mesh.position,col,e.type==="scout"?12:18,e.type==="scout"?1:1.4);
-    // drops
-    const drops=e.type==="scout"?1:3;
+    const col=e.type==="scout"?0xff7043:e.type==="bomber"?0xff4400:e.type==="gunship"?0x44ff88:0xab47bc;
+    const cnt=e.type==="bomber"?22:e.type==="gunship"?16:e.type==="scout"?12:18;
+    const pwr=e.type==="bomber"?1.8:e.type==="gunship"?1.4:e.type==="scout"?1:1.4;
+    spawnExplosion(e.mesh.position,col,cnt,pwr);
+    // drops + scrap (bombers drop more)
+    const drops=e.type==="scout"?1:e.type==="bomber"?5:3;
     for(let k=0;k<drops;k++) spawnCoin(e.mesh.position);
-    if(Math.random()<(e.type==="scout"?0.06:0.16)) spawnPowerup(e.mesh.position.clone());
-    if(Math.random()<(e.type==="scout"?0.05:0.1)) spawnHealth(e.mesh.position.clone());
+    spawnScrap(e.mesh.position, e.type==="scout"?1:e.type==="bomber"?4:2);
+    if(Math.random()<(e.type==="scout"?0.06:0.18)) spawnPowerup(e.mesh.position.clone());
+    if(Math.random()<(e.type==="scout"?0.015:0.05)) spawnHealth(e.mesh.position.clone());
+    // score
+    const pts=e.type==="scout"?100:e.type==="bomber"?400:e.type==="gunship"?300:250;
+    // EMP ring upgrade
+    Forge.empKillCount++;
+    if(Forge.active.emp_ring && Forge.empKillCount>=15){
+      Forge.empKillCount=0;
+      Player.empNova();
+    }
     scene.remove(e.mesh); enemies.splice(enemies.indexOf(e),1);
-    State.kills++; addScore(e.type==="scout"?100:250);
-    HUD.updateScore();
+    addScore(pts); State.kills++; HUD.updateScore();
   }
 }
 function spawnHitSpark(pos){
@@ -1148,20 +1633,32 @@ function spawnHitSpark(pos){
       spin:new THREE.Vector3(5,5,5),life:0.25,age:0}; activeDebris.push(d);
   }
 }
-
+function spawnThrusterSmoke(pos, color){
+  const d=getDebris(); d.material.color.setHex(color); d.position.copy(pos);
+  d.scale.setScalar(0.16 + Math.random()*0.12);
+  d.userData={
+    vel:new THREE.Vector3((Math.random()-0.5)*1.5, (Math.random()-0.5)*1.5, 12 + Math.random()*8),
+    spin:new THREE.Vector3((Math.random()-0.5)*8, (Math.random()-0.5)*8, (Math.random()-0.5)*8),
+    life:0.2 + Math.random()*0.15,
+    age:0
+  };
+  activeDebris.push(d);
+}
 /* -------------------------------- BOSS ------------------------------------ */
 function spawnBoss(level){
   level=level||1;
   const meta=LEVELS[level-1];
   const conf={
-    1:{build:buildBoss,  y:1.8, scale:0.9,  hp:2600},
-    2:{build:buildBoss2, y:2.0, scale:1.0,  hp:4200},
-    3:{build:buildBoss2, y:2.2, scale:1.12, hp:6400},
-    4:{build:buildBoss2, y:2.4, scale:1.28, hp:9000},
+    1:{build:buildBoss,  y:1.8, scale:0.9,  hp:3800},
+    2:{build:buildBoss2, y:2.0, scale:1.0,  hp:5600},
+    3:{build:buildBoss2, y:2.2, scale:1.12, hp:8000},
+    4:{build:buildBoss2, y:2.4, scale:1.28, hp:11500},
   }[level];
   const mesh=conf.build(); mesh.scale.setScalar(conf.scale);
   boss={mesh, hp:conf.hp, maxhp:conf.hp, stage:level, baseY:conf.y, diff:meta.diff,
-        t:0, phase:0, fireCd:2.5, moveCd:0, tx:0, hitFlash:0, entering:true};
+        t:0, phase:0, fireCd:2.5, moveCd:0, tx:0, hitFlash:0, entering:true,
+        enemySpawnCd:5.0, shieldCd:40, shieldActive:0, chargeCd:0, chargeZ:-42,
+        rageChargeCd:0};
   mesh.position.set(0,conf.y,-140); mesh.rotation.y=Math.PI; scene.add(mesh);
   Sound.boss(); HUD.showToast(level>=4?"⚠ FINAL BOSS ⚠":"⚠ BOSS ⚠");
   document.getElementById("boss-name").textContent=meta.boss;
@@ -1170,39 +1667,125 @@ function spawnBoss(level){
 }
 function updateBoss(dt){
   if(!boss)return; const m=boss.mesh; boss.t+=dt;
-  if(boss.entering){ m.position.z += (-42-m.position.z)*Math.min(1,dt*0.6); if(m.position.z>-46)boss.entering=false; return; }
-  // side-to-side movement
-  boss.moveCd-=dt;
-  if(boss.moveCd<=0){ boss.tx=(Math.random()-0.5)*40; boss.moveCd=2+Math.random()*2; }
-  m.position.x += (boss.tx-m.position.x)*Math.min(1,dt*0.7);
-  m.position.y = boss.baseY + Math.sin(boss.t*0.8)*1.0;
-  m.rotation.z = (boss.tx-m.position.x)*0.01;
-  // attacks
-  boss.fireCd-=dt;
+  if(boss.entering){ m.position.z += (-42-m.position.z)*Math.min(1,dt*0.6); if(m.position.z>-46){ boss.entering=false; boss.chargeZ=-42; } return; }
+
   const hpFrac=boss.hp/boss.maxhp;
-  const spd = Math.max(0.5, 1 - (boss.diff-1)*0.28);   // pricier levels fire faster
-  const interval = (hpFrac<0.4?0.9 : hpFrac<0.7?1.3 : 1.8)*spd;
-  if(boss.fireCd<=0){
+
+  // --- Phase transitions ---
+  if(boss.phase===0 && hpFrac<0.6){
+    boss.phase=1;   // Overdrive phase
+    boss.moveCd=0;
+    HUD.showToast('OVERDRIVE MODE');
+    // flash body red
+    m.traverse(c=>{ if(c.material && c.material.emissive) c.material.emissive.setHex(0x440000); });
+  }
+  if(boss.phase===1 && hpFrac<0.3){
+    boss.phase=2;   // Rage phase
+    boss.moveCd=0; boss.rageChargeCd=4;
+    HUD.showToast('RAGE — BRACE!');
+    m.traverse(c=>{ if(c.material && c.material.emissive) c.material.emissive.setHex(0x880000); });
+  }
+
+  // --- Shield pulse (immune every 40s for 3s) ---
+  boss.shieldCd-=dt;
+  if(boss.shieldCd<=0 && boss.shieldActive<=0){
+    boss.shieldActive=3.0; boss.shieldCd=40;
+    HUD.showToast('SHIELD ACTIVE!');
+    m.traverse(c=>{ if(c.material) c.material.transparent=true; });
+  }
+  if(boss.shieldActive>0){
+    boss.shieldActive-=dt;
+    const pulse=0.45+Math.sin(boss.t*12)*0.25;
+    m.traverse(c=>{ if(c.material && c.material.transparent) c.material.opacity=pulse; });
+    if(boss.shieldActive<=0){
+      m.traverse(c=>{ if(c.material){ c.material.transparent=false; c.material.opacity=1; }});
+      HUD.showToast('SHIELD DOWN — FIRE!');
+    }
+  }
+
+  // --- Support spawns — get more aggressive per phase ---
+  boss.enemySpawnCd -= dt;
+  if(boss.enemySpawnCd <= 0){
+    const interval = boss.phase===2 ? 3.5 : boss.phase===1 ? 4.5 : 5.5;
+    boss.enemySpawnCd = interval + Math.random()*2.5;
+    const spawnX=(Math.random()-0.5)*36;
+    if(boss.phase>=2){
+      // rage: spawn a pair
+      makeEnemy('fighter', spawnX, 3+Math.random()*4, -150);
+      makeEnemy('scout', -spawnX*0.5, 4+Math.random()*3, -160);
+    } else if(boss.phase===1){
+      makeEnemy(Math.random()<0.5?'fighter':'scout', spawnX, 3+Math.random()*5, -150);
+    } else {
+      makeEnemy(Math.random()<0.35?'fighter':'scout', spawnX, 3+Math.random()*5, -150);
+    }
+  }
+
+  // --- Charge attack in Rage phase ---
+  if(boss.phase>=2){
+    boss.rageChargeCd-=dt;
+    if(boss.rageChargeCd<=0){
+      boss.rageChargeCd = 8+Math.random()*5;
+      // Lunge toward player (Z charge)
+      boss.chargeZ = -20;   // push close
+      setTimeout(()=>{ if(boss) boss.chargeZ=-42; }, 1200);
+    }
+  }
+  const targetZ = boss.chargeZ ?? -42;
+  m.position.z += (targetZ - m.position.z)*Math.min(1, dt*(boss.phase>=2 ? 1.2 : 0.5));
+
+  // --- Side-to-side movement (faster each phase) ---
+  boss.moveCd-=dt;
+  const moveSpeed = boss.phase===2 ? 1.4 : boss.phase===1 ? 1.1 : 0.7;
+  if(boss.moveCd<=0){
+    boss.tx=(Math.random()-0.5)*(boss.phase>=1 ? 54 : 40);
+    boss.moveCd = (boss.phase===2?0.9:boss.phase===1?1.4:2)+Math.random()*1.5;
+  }
+  m.position.x += (boss.tx-m.position.x)*Math.min(1,dt*moveSpeed);
+  m.position.y = boss.baseY + Math.sin(boss.t*(boss.phase===2?1.6:0.8))*(boss.phase===2?2.0:1.0);
+  m.rotation.z = (boss.tx-m.position.x)*0.012;
+
+  // --- Attacks ---
+  boss.fireCd-=dt;
+  const spd = Math.max(0.4, 1-(boss.diff-1)*0.28);
+  // fire interval shrinks dramatically with phase and HP
+  const interval = (
+    hpFrac<0.3 ? 0.55 :
+    hpFrac<0.6 ? 0.85 :
+    hpFrac<0.8 ? 1.2  : 1.7
+  )*spd;
+  if(boss.fireCd<=0 && boss.shieldActive<=0){
     boss.fireCd=interval;
-    const pat=(Math.random()*(hpFrac<0.5?3:2))|0;
-    if(pat===0){ // spread fan
-      for(let a=-2;a<=2;a++){
-        const dir=new THREE.Vector3(a*0.18+ (Player.x-m.position.x)*0.01,-0.05,1).normalize();
+    const patMax = boss.phase===2?4 : boss.phase===1?3 : 2;
+    const pat=(Math.random()*patMax)|0;
+    if(pat===0){ // spread fan — wider in rage
+      const spread = boss.phase>=2 ? 4 : boss.phase===1 ? 3 : 2;
+      for(let a=-spread;a<=spread;a++){
+        const dir=new THREE.Vector3(a*0.14+(Player.x-m.position.x)*0.012,-0.04,1).normalize();
         fireEnemyBullet(m.position.clone(),dir,12);
       }
     } else if(pat===1){ // aimed burst from wings
       [[6,0,0],[-6,0,0]].forEach(off=>{
         const p=m.position.clone().add(new THREE.Vector3(off[0]*0.9,0,3));
         const dir=new THREE.Vector3(Player.x-p.x,Player.y-p.y,0-p.z).normalize();
-        fireEnemyBullet(p,dir,10);
+        fireEnemyBullet(p,dir,10+(boss.phase*3));
       });
-    } else { // radial
-      for(let a=0;a<8;a++){ const ang=a/8*Math.PI*2; fireEnemyBullet(m.position.clone(),new THREE.Vector3(Math.cos(ang),Math.sin(ang)*0.5,0.7).normalize(),9); }
+    } else if(pat===2){ // radial ring
+      const rays=boss.phase>=2?12:8;
+      for(let a=0;a<rays;a++){ const ang=a/rays*Math.PI*2; fireEnemyBullet(m.position.clone(),new THREE.Vector3(Math.cos(ang),Math.sin(ang)*0.5,0.7).normalize(),9); }
+    } else { // rage exclusive: tracking triple-burst
+      for(let s=0;s<3;s++){
+        setTimeout(()=>{
+          if(!boss||boss.shieldActive>0)return;
+          const dir=new THREE.Vector3(Player.x-m.position.x,Player.y-m.position.y,0-m.position.z).normalize();
+          dir.x+=(Math.random()-0.5)*0.15; dir.y+=(Math.random()-0.5)*0.1;
+          fireEnemyBullet(m.position.clone(),dir,15);
+        },s*140);
+      }
     }
-    // stage 2+ : extra aimed twin-cannon volley every shot for added danger
+    // stage 2+: extra aimed twin-cannon volley
     if(boss.stage>=2){
-      for(const s of [1,-1]){
-        const p=m.position.clone().add(new THREE.Vector3(s*4.6,0.6,-6));
+      for(const sv of [1,-1]){
+        const p=m.position.clone().add(new THREE.Vector3(sv*4.6,0.6,-6));
         const dir=new THREE.Vector3(Player.x-p.x,Player.y-p.y,0-p.z).normalize();
         fireEnemyBullet(p,dir,14);
       }
@@ -1212,7 +1795,23 @@ function updateBoss(dt){
 }
 function hitBoss(dmg,pos){
   if(!boss||boss.entering)return;
-  boss.hp-=dmg; boss.hitFlash=0.08; spawnHitSpark(pos);
+  // Shield absorbs all damage
+  if(boss.shieldActive>0){
+    spawnHitSpark(pos); addShake(0.1);
+    HUD.showToast('SHIELDED!');
+    return;
+  }
+  // Weak-point vs body damage: check if hit pos is near a weak point mesh
+  let isWeakPoint=false;
+  if(boss.mesh.userData.weakpoints){
+    boss.mesh.userData.weakpoints.forEach(wp=>{
+      const wpWorld=new THREE.Vector3(); wp.getWorldPosition(wpWorld);
+      if(wpWorld.distanceTo(pos)<4.5) isWeakPoint=true;
+    });
+  }
+  const finalDmg = isWeakPoint ? dmg : Math.round(dmg*0.30);
+  boss.hp-=finalDmg; boss.hitFlash=0.08; spawnHitSpark(pos);
+  if(!isWeakPoint && Math.random()<0.4) HUD.showToast('AIM FOR WEAK POINTS!');
   if(Math.random()<0.3) spawnExplosion(pos,0xffb14a,4,0.6);
   HUD.updateBoss();
   if(boss.hp<=0){ defeatBoss(); }
@@ -1245,19 +1844,42 @@ const Level = {
     level = level || State.level || 1;
     State.level = level;
     const L=level;
-    const cadence = Math.max(3.2, 6.6 - L*0.55);   // waves come faster each level
-    const waves = 7 + L*2;                          // and there are more of them
+    const cadence = Math.max(2.6, 5.8 - L*0.6);    // waves come faster each level
+    const waves = 10 + L*3;                         // many more waves, longer pre-boss
     const s=[]; let t=3;
     for(let i=0;i<waves;i++){
       const idx=i;
       s.push([+t.toFixed(1), ()=>{
-        const n = Math.min(9, 3 + Math.floor(idx*0.4) + L);
-        if(idx%3===2){ const fN=Math.min(5,1+L); for(let f=0;f<fN;f++) makeEnemy("fighter",(f-(fN-1)/2)*11, 4+f, -150-f*10); }
-        else if(idx%4===1){ waveV("scout", Math.min(8,4+L), -150); }
+        const n = Math.min(10, 3 + Math.floor(idx*0.35) + L);
+        const late = idx > waves*0.55;   // second half of the level = harder waves
+        // bomber waves: appear from L2 onwards, more frequent in L3/L4
+        if(L>=2 && idx%5===3){
+          const bN=Math.min(3,1+Math.floor(L/2));
+          for(let b=0;b<bN;b++) makeEnemy("bomber",(b-(bN-1)/2)*18, 3, -160-b*12);
+        }
+        // gunship waves: appear from L3 onwards
+        else if(L>=3 && idx%4===2){
+          const gN=Math.min(4,2+Math.floor((L-2)/1));
+          for(let gf=0;gf<gN;gf++) makeEnemy("gunship",(gf-(gN-1)/2)*12, 4+gf*0.5, -155-gf*8);
+        }
+        // fighter formation
+        else if(idx%3===2){
+          const fN=Math.min(5,1+L);
+          for(let f=0;f<fN;f++) makeEnemy("fighter",(f-(fN-1)/2)*11, 4+f, -150-f*10);
+        }
+        // V-formation scouts
+        else if(idx%4===1){ waveV("scout", Math.min(9,4+L), -150); }
+        // line scouts
         else { waveLine("scout", n, -150, 50+n*2); }
+        // mid-level mixed wave in late game
+        if(late && L>=2 && idx%6===0 && idx>0){
+          makeEnemy("fighter",-(Math.random()-0.5)*16, 5, -170);
+          makeEnemy("fighter", (Math.random()-0.5)*16, 3, -180);
+        }
       }]);
-      if(i===Math.floor(waves*0.4)) s.push([+ (t+1).toFixed(1), ()=>{ HUD.showToast("POWER-UP!"); spawnPowerup(new THREE.Vector3((Math.random()-0.5)*12,4,-70)); }]);
-      if(i===waves-1) s.push([+ (t+1.5).toFixed(1), ()=>{ HUD.showToast("BRACE"); }]);
+      if(i===Math.floor(waves*0.35)) s.push([+(t+1).toFixed(1), ()=>{ HUD.showToast("POWER-UP!"); spawnPowerup(new THREE.Vector3((Math.random()-0.5)*12,4,-70)); }]);
+      if(i===Math.floor(waves*0.65)) s.push([+(t+1).toFixed(1), ()=>{ HUD.showToast("POWER-UP!"); spawnPowerup(new THREE.Vector3((Math.random()-0.5)*12,4,-70)); }]);
+      if(i===waves-1) s.push([+(t+1.5).toFixed(1), ()=>{ HUD.showToast("BRACE FOR BOSS"); }]);
       t += cadence;
     }
     // boss appears with a delay: warn first, then the delayed dramatic entrance (delay grows per level)
@@ -1319,6 +1941,8 @@ function addScore(v){ State.score+=v; }
 const LEVEL_SPEED = 30; // world scroll speed (feel of forward flight)
 
 function startGame(level){
+  applyTheme(level||1);
+  currentEnvType = (THEMES[level||1]||THEMES[1]).envType;
   Sound.resume();
   requestAd();
   level = level || 1;
@@ -1332,6 +1956,7 @@ function startGame(level){
   coins.forEach(c=>scene.remove(c)); coins.length=0;
   powerups.forEach(p=>scene.remove(p)); powerups.length=0;
   State.score=0; State.coins=0; State.kills=0;
+  Forge.reset();
   Player.reset(); Level.build(level);
   State.mode="play"; State.running=true;
   showScreen(null); document.getElementById("hud").classList.add("on");
@@ -1343,9 +1968,24 @@ function die(){
   State.mode="dead";
   spawnExplosion(Player.group.position,Player.def.accent,26,2.4); addShake(1.2);
   Player.jetMesh.visible=false;
-  setTimeout(()=>endGame(false),1100);
+  // cinematic defeat: red vignette flash, then slow game time, then screen
+  const ov=document.getElementById('cinematic-overlay');
+  ov.style.background='radial-gradient(ellipse at center, rgba(255,30,0,.0) 30%, rgba(200,0,0,.75) 100%)';
+  ov.classList.add('on');
+  // slow-motion feel (reduce dt multiplier via State flag)
+  State.slowMo=0.18;
+  setTimeout(()=>{ ov.style.opacity='0'; State.slowMo=1; setTimeout(()=>{ ov.classList.remove('on'); endGame(false); },480); },1800);
 }
-function victory(level){ if(State.mode==="dead")return; State.mode="win"; endGame(true, level); }
+function victory(level){
+  if(State.mode==="dead")return;
+  State.mode="win";
+  // cinematic victory: gold radial flash, brief pause, then screen
+  const ov=document.getElementById('cinematic-overlay');
+  ov.style.background='radial-gradient(ellipse at center, rgba(255,210,74,.55) 0%, rgba(255,150,0,.22) 50%, transparent 80%)';
+  ov.classList.add('on');
+  State.slowMo=0.25;
+  setTimeout(()=>{ ov.style.opacity='0'; State.slowMo=1; setTimeout(()=>{ ov.classList.remove('on'); endGame(true,level); },380); },1400);
+}
 function endGame(won, level){
   State.running=false;
   Player.jetMesh.visible=true;
@@ -1392,7 +2032,7 @@ function buildLevelSelect(){
     const unlocked=L.n<=Save.data.unlocked, cleared=L.n<Save.data.unlocked;
     const card=document.createElement("div"); card.className="levelcard"+(unlocked?"":" locked");
     const dots="●".repeat(L.n)+"○".repeat(4-L.n);
-    const status = unlocked ? (cleared?'<span class="lv-clear">✓ Cleared</span>':'<span class="lv-play">▶ Play</span>') : '<span class="lv-lock">🔒 Locked</span>';
+    const status = unlocked ? (cleared?'<span class="lv-clear">Cleared</span>':'<span class="lv-play">Play</span>') : '<span class="lv-lock">Locked</span>';
     card.innerHTML=`<div class="lv-num">${L.n}</div>
       <div class="lv-info"><h3>${L.name}</h3><div class="lv-sub">${L.sub}</div>
       <div class="lv-diff">Threat <span>${dots}</span></div></div>
@@ -1493,6 +2133,7 @@ let last=performance.now();
 function gameLoop(now){
   requestAnimationFrame(gameLoop);
   let dt=(now-last)/1000; last=now; if(dt>0.05)dt=0.05;
+  if(State.slowMo && State.slowMo!==1) dt*=State.slowMo;
 
   // Sync size changes (handles iframe size transitions on mobile)
   if (window.innerWidth !== lastWidth || window.innerHeight !== lastHeight) {
@@ -1510,6 +2151,7 @@ function gameLoop(now){
   for(let i=envPool.length-1;i>=0;i--){
     const o=envPool[i]; o.mesh.position.z += LEVEL_SPEED*dt;
     if(o.bird){ o.mesh.position.x += dt*3; o.mesh.position.y += Math.sin(performance.now()*0.002+o.bob)*dt*1.5; }
+    if(o.tumble){ o.mesh.rotation.x += dt*0.4; o.mesh.rotation.z += dt*0.25; } // asteroids/debris tumble
     if(o.mesh.position.z>40){ world.remove(o.mesh); envPool.splice(i,1); spawnEnv(-280-Math.random()*30); }
   }
 
@@ -1519,6 +2161,8 @@ function gameLoop(now){
     updateEnemies(dt);
     if(boss)updateBoss(dt);
     updateCollectibles(dt);
+    updateScrap(dt);
+    Forge.update(dt);
     // bullets
     updateBullets(dt);
     if(Player.active.shield>0){} // shield timer handled in player
@@ -1583,8 +2227,26 @@ function updateBullets(dt){
    SCREENS / UI WIRING
    ========================================================================== */
 function showScreen(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));
-  if(id) document.getElementById(id).classList.add("on");
+  const screens=document.querySelectorAll(".screen");
+  const current=[...screens].find(s=>s.classList.contains('on'));
+  const next=id?document.getElementById(id):null;
+  const doShow=()=>{
+    screens.forEach(s=>{ s.classList.remove('on','entering'); s.style.display='none'; });
+    if(next){
+      next.style.display='flex';
+      // force reflow so the transition triggers
+      next.offsetHeight;
+      requestAnimationFrame(()=>{ next.classList.add('on'); });
+    }
+  };
+  if(current && next && current!==next){
+    // animate out
+    current.style.transition='opacity .22s ease,transform .22s ease';
+    current.style.opacity='0'; current.style.transform='translateY(-8px)';
+    setTimeout(()=>{ current.style.transition=''; current.style.opacity=''; current.style.transform=''; doShow(); },230);
+  } else {
+    doShow();
+  }
 }
 function refreshCoinLabels(){
   ["menu-coins","hangar-coins"].forEach(id=>{ const el=document.getElementById(id); if(el)el.textContent=Save.data.coins.toLocaleString(); });
@@ -1625,10 +2287,10 @@ const Carousel = {
     const owned=Save.data.owned.includes(key), selected=Save.data.selected===key;
     const stat=(n,v)=>`<div class="cstat"><span class="sn">${n}</span><span class="sb"><i style="width:${v*100}%"></i></span></div>`;
     let action;
-    if(selected) action=`<button class="btn ghost cbuy" disabled>\u2713 Selected</button>`;
+    if(selected) action=`<button class="btn ghost cbuy" disabled>Selected</button>`;
     else if(owned) action=`<button class="btn cbuy" id="c-select">Select</button>`;
     else action=`<button class="btn cbuy ${Save.data.coins>=d.price?'':'ghost'}" id="c-buy" ${Save.data.coins>=d.price?'':'disabled'}><span class="price"><span class="coin-ic"></span>${d.price.toLocaleString()}</span></button>`;
-    const status = selected?'<span style="color:var(--gold)">\u25cf Selected</span>':owned?'<span style="color:#7dffb2">\u25cf Owned</span>':'<span style="color:#8fb6dd">\ud83d\udd12 Locked</span>';
+    const status = selected?'<span style="color:var(--gold)">Selected</span>':owned?'<span style="color:#7dffb2">Owned</span>':'<span style="color:#8fb6dd">Locked</span>';
     document.getElementById("c-info").innerHTML=`<h2>${d.name}</h2><div class="role">${d.role}</div>
       ${d.special?`<div class="sp-tag">${d.special.icon} ${d.special.name}</div>`:""}
       <div style="font-size:12px;margin-top:2px">${status}</div>
@@ -1636,7 +2298,7 @@ const Carousel = {
       ${action}`;
     const stage=document.getElementById("c-stage");
     const oldOv=stage.querySelector(".lock-ov"); if(oldOv)oldOv.remove();
-    if(!owned){ const o=document.createElement("div"); o.className="lock-ov"; o.textContent="\ud83d\udd12"; stage.appendChild(o); }
+    if(!owned){ const o=document.createElement("div"); o.className="lock-ov"; o.textContent="LOCKED"; stage.appendChild(o); }
     const dots=document.getElementById("c-dots"); dots.innerHTML="";
     JET_ORDER.forEach((k,j)=>{ const dot=document.createElement("div");
       dot.className="cdot"+(j===this.idx?" on":"")+(Save.data.owned.includes(k)?" owned":"");

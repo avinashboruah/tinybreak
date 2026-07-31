@@ -34,6 +34,7 @@ export default function Navbar({ onRandomGame, searchQuery, setSearchQuery, curr
           }} />
           <input
             id="nav-search-input"
+            className="nav-search-input"
             type="text"
             placeholder="Search games..."
             value={searchQuery}
@@ -43,26 +44,6 @@ export default function Navbar({ onRandomGame, searchQuery, setSearchQuery, curr
               if (currentView !== 'games') {
                 setCurrentView('games');
               }
-            }}
-            style={{
-              background: '#f9f5f2',
-              border: '2px solid #1a1a1a',
-              borderRadius: 999,
-              padding: '8px 16px 8px 40px',
-              fontFamily: "'IBM Plex Sans', sans-serif",
-              fontSize: 14,
-              width: 220,
-              outline: 'none',
-              transition: 'width 200ms ease, box-shadow 200ms ease',
-              boxShadow: '0 2px 0 #1a1a1a',
-            }}
-            onFocus={(e) => {
-              e.target.style.width = '280px';
-              e.target.style.boxShadow = '0 4px 0 #1a1a1a';
-            }}
-            onBlur={(e) => {
-              e.target.style.width = '220px';
-              e.target.style.boxShadow = '0 2px 0 #1a1a1a';
             }}
           />
         </div>
@@ -112,14 +93,7 @@ export default function Navbar({ onRandomGame, searchQuery, setSearchQuery, curr
               setCurrentView('games');
             }
           }}
-          className="pulse-button"
-          style={{
-            background: '#f4ed36', color: '#000',
-            border: '2px solid #1a1a1a', borderRadius: 999,
-            padding: '10px 22px', fontFamily: "'IBM Plex Sans', sans-serif",
-            fontWeight: 600, fontSize: 15, cursor: 'pointer',
-            transition: 'transform 200ms, box-shadow 200ms'
-          }}
+          className="pulse-button nav-random-btn"
         >🎲 Random Game</button>
       </div>
     </nav>
