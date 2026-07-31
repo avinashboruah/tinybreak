@@ -199,7 +199,63 @@
   .spinner{width:34px;height:34px;border:3px solid rgba(255,255,255,.2);border-top-color:var(--gold);border-radius:50%;
     animation:spin 1s linear infinite;margin-right:14px}
   @keyframes spin{to{transform:rotate(360deg)}}
-  @media(max-width:560px){ .bar{width:160px} }
+  @media(max-width: 480px) {
+    /* HUD UI Scaling */
+    .bar { width: 120px; height: 12px; }
+    .score { font-size: 24px; }
+    .coins-hud { font-size: 18px; }
+    .coin-ic { width: 14px; height: 14px; }
+    .sp-ring { width: 48px; height: 48px; }
+    .sp-ic { font-size: 20px; }
+    .sp-nm { font-size: 11px; }
+    .sp-key { display: none; }
+    .sp-badge { gap: 8px; bottom: 12px; left: 12px; }
+    .pw { width: 44px; height: 44px; border-radius: 10px; }
+    .pw .ic { font-size: 18px; }
+    .pw .nm { font-size: 7px; }
+    
+    /* Layout & Screen Overlays */
+    .screen { padding: 16px; }
+    .logo { font-size: 34px !important; text-shadow: 0 4px 0 #1b4d80, 0 6px 12px rgba(0,0,0,.4); }
+    .logo b { text-shadow: 0 4px 0 #a9791a, 0 6px 12px rgba(0,0,0,.4); }
+    .sub { font-size: 12px; margin-top: 8px; letter-spacing: 2px; }
+    .btns { margin-top: 24px; gap: 10px; width: 100%; max-width: 280px; }
+    .btn { font-size: 15px; padding: 12px 16px; border-radius: 10px; box-shadow: 0 4px 0 #b8871f, 0 6px 12px rgba(0,0,0,.25); }
+    .btn:active { box-shadow: 0 1px 0 #b8871f; }
+    .btn.sec { box-shadow: 0 4px 0 #0f2c4a, 0 6px 12px rgba(0,0,0,.25); }
+    .btn.sec:active { box-shadow: 0 1px 0 #0f2c4a; }
+    .tip { font-size: 11px; margin-top: 18px; }
+
+    /* Hangar View Carousel */
+    .cstage { height: 180px; border-radius: 12px; }
+    .cbtn { width: 40px; height: 40px; font-size: 24px; padding-bottom: 2px; }
+    .cinfo h2 { font-size: 22px; }
+    .cstats { gap: 10px; margin-top: 4px; }
+    .cstat { width: 62px; }
+    .cstat .sn { font-size: 8px; }
+    .cstat .sb { height: 5px; }
+    .cdots { margin-top: 10px; gap: 6px; }
+    .cdot { width: 7px; height: 7px; }
+    .cbuy { margin-top: 10px; width: 100%; max-width: 240px; }
+    .hangar { max-height: 96vh; }
+    
+    /* Level Selector */
+    .levelgrid { gap: 10px; margin-top: 16px; }
+    .levelcard { padding: 10px 12px; border-radius: 12px; gap: 12px; }
+    .levelcard .lv-num { font-size: 28px; width: 36px; text-shadow: 0 2px 0 #a9791a; }
+    .levelcard h3 { font-size: 16px; }
+    .lv-sub { font-size: 11px; margin: 1px 0 3px; }
+    .lv-diff { font-size: 10px; }
+    .lv-status { font-size: 11px; }
+
+    /* Settings Menu */
+    .settings { gap: 10px; margin-top: 16px; }
+    .setrow { padding: 10px 12px; border-radius: 10px; }
+    .setrow label { font-size: 12px; }
+    input[type=range] { width: 100px; }
+    .rules-box { font-size: 11px !important; padding: 10px !important; margin-top: 12px !important; }
+    .rules-box h3 { font-size: 13px !important; margin-bottom: 6px !important; }
+  }
 </style>
 </head>
 <body>
@@ -243,9 +299,8 @@
   <div class="btns">
     <button class="btn" id="b-play">▶ Play</button>
     <button class="btn sec" id="b-hangar">✈ Hangar</button>
-    <button class="btn ghost" id="b-settings">⚙ Settings</button>
+    <button class="btn ghost" id="b-settings">⚙ Settings & Rules</button>
   </div>
-  <div class="tip">Fly with <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / arrows or by dragging the screen · <kbd>Space</kbd> / hold drag to fire · <kbd>Shift</kbd> / tap badge for special.</div>
 </div>
 
 <!-- HANGAR -->
@@ -270,10 +325,17 @@
 
 <!-- SETTINGS -->
 <div class="screen" id="s-settings">
-  <div class="logo" style="font-size:34px">Settings</div>
+  <div class="logo" style="font-size:34px">Settings & Rules</div>
   <div class="settings">
     <div class="setrow"><label>Master volume</label><input type="range" id="set-vol" min="0" max="1" step="0.05" value="0.5"></div>
     <div class="setrow"><label>Invert vertical</label><input type="checkbox" id="set-inv" style="width:20px;height:20px;accent-color:var(--gold)"></div>
+  </div>
+  <div class="rules-box" style="margin-top:20px; padding:16px; background:var(--panel); border:1px solid var(--panelb); border-radius:14px; max-width:420px; width:84vw; text-align:left; font-size:13px; line-height:1.6; color:#bfe0ff">
+    <h3 style="font-family:'Russo One',sans-serif; font-size:15px; color:var(--gold); margin-bottom:10px; text-transform:uppercase">How to Play</h3>
+    <div style="margin-bottom:8px">✈ <b>Move:</b> Use <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / Arrow keys or <b>drag on mobile screen</b>.</div>
+    <div style="margin-bottom:8px">🔥 <b>Fire:</b> Hold <kbd>Space</kbd> or <b>touch-drag screen to auto-fire</b>.</div>
+    <div style="margin-bottom:8px">⚡ <b>Special:</b> Press <kbd>Shift</kbd> or <b>tap the shield/badge</b> to trigger special weapon when ready.</div>
+    <div>🎯 <b>Objective:</b> Fly through checkpoints, shoot enemy fighters/bosses, collect coins, and buy stronger jets in the Hangar!</div>
   </div>
   <div class="btns" style="width:min(340px,80vw)"><button class="btn sec" id="b-settings-back">◀ Back</button></div>
 </div>
