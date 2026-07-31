@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gold Tide — a lazy pirate voyage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap" rel="stylesheet">
+<script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0c2030; font-family: system-ui, -apple-system, sans-serif; }
+  a { color: #f0b32c; } a:hover { color: #ffd76a; }
+  #game { display: block; width: 100%; height: 100%; }
+  .hidden { display: none !important; }
+  #flash { position: fixed; inset: 0; background: #fff6dd; opacity: 0; pointer-events: none; z-index: 5; }
+
+  #hud { position: fixed; inset: 0; pointer-events: none; color: #fff; }
+  .panel {
+    background: rgba(10, 30, 46, 0.55); border: 1px solid rgba(240, 179, 44, 0.35);
+    border-radius: 10px; backdrop-filter: blur(6px); padding: 10px 16px;
+  }
+  #score-panel { position: absolute; top: 18px; left: 18px; display: flex; align-items: center; gap: 12px; }
+  #score-panel svg { width: 34px; height: 34px; }
+  #score { font-size: 30px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+  #best { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.55); }
+  #score-panel.pop svg { animation: pop 0.45s ease; }
+  @keyframes pop { 30% { transform: scale(1.35) rotate(-8deg); } }
+
+  .count-item { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .count-item .swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .count-item.pop { animation: pop 0.45s ease; }
+
+  #speed-panel { position: absolute; top: 18px; right: 18px; text-align: right; }
+  #speed { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  #speed-panel small { display: block; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.55); }
+
+  #lives-panel svg { width: 22px; height: 22px; }
+  #lives-panel svg.lost path { fill: rgba(255,255,255,0.15); }
+
+  #achv-btn { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%); pointer-events: auto; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: #f0b32c;
+    background: rgba(10, 30, 46, 0.55); border: 1px solid rgba(240, 179, 44, 0.35); border-radius: 8px; padding: 8px 14px; backdrop-filter: blur(6px);
+    z-index: 6; }
+
+  #settings-btn { position: fixed; bottom: 26px; right: 18px; pointer-events: auto; cursor: pointer; z-index: 6;
+    display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%;
+    background: rgba(10, 30, 46, 0.55); border: 1px solid rgba(240, 179, 44, 0.35); backdrop-filter: blur(6px); }
+  #settings-btn svg { width: 20px; height: 20px; }
+  #settings-panel { position: fixed; inset: 0; background: rgba(7, 22, 34, 0.78); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center; pointer-events: auto; z-index: 8; }
+  #settings-panel.hidden { display: none; }
+  #settings-panel .settings-box { background: rgba(10, 30, 46, 0.92); border: 1px solid rgba(240, 179, 44, 0.4);
+    border-radius: 14px; padding: 28px 32px; width: min(380px, 90vw); color: #fff; }
+  #settings-panel h2 { font-family: "Pirata One", serif; font-weight: 400; color: #f0b32c; margin: 0 0 18px; font-size: 28px; text-align: center; }
+  .settings-row { margin-bottom: 18px; }
+  .settings-row label { display: flex; justify-content: space-between; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
+  .settings-row input[type="range"] { width: 100%; accent-color: #f0b32c; }
+  #settings-close { display: block; margin: 6px auto 0; background: none; border: 1px solid rgba(240,179,44,0.5); color: #f0b32c;
+    border-radius: 8px; padding: 8px 20px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+
+  #tutorial-banner { position: fixed; top: 74px; left: 50%; transform: translateX(-50%); z-index: 6;
+    background: rgba(10, 30, 46, 0.85); border: 1px solid rgba(240, 179, 44, 0.55); border-radius: 10px;
+    padding: 10px 18px; color: #fff; text-align: center; max-width: 380px; opacity: 0; pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease; }
+  #tutorial-banner.show { opacity: 1; transform: translateX(-50%) translateY(4px); }
+  #tutorial-banner .tut-title { font-size: 13px; font-weight: 700; color: #f0b32c; text-transform: uppercase; letter-spacing: 0.06em; }
+  #tutorial-banner .tut-desc { font-size: 12px; color: rgba(255,255,255,0.75); margin-top: 3px; }
+
+  #kraken-warning { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -60%); z-index: 6; text-align: center;
+    opacity: 0; transition: opacity 0.2s ease; pointer-events: none; }
+  #kraken-warning.show { opacity: 1; }
+  #kraken-warning .kw-num { font-size: 64px; font-weight: 800; color: #ff3b3b; text-shadow: 0 0 20px rgba(255,40,40,0.8), 0 2px 8px rgba(0,0,0,0.6); line-height: 1; }
+  #kraken-warning .kw-label { font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; margin-top: 4px; text-shadow: 0 2px 6px rgba(0,0,0,0.6); }
+
+  #touch-controls { display: none; }
+  @media (any-pointer: coarse) {
+    #touch-controls { display: block; pointer-events: none; }
+    #joystick-base { position: fixed; bottom: 30px; left: 30px; width: 96px; height: 96px; border-radius: 50%;
+      background: rgba(10, 30, 46, 0.45); border: 1px solid rgba(255,255,255,0.25); pointer-events: auto; touch-action: none; }
+    #joystick-knob { position: absolute; top: 50%; left: 50%; width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(240, 179, 44, 0.65); transform: translate(-50%, -50%); }
+    #throttle-controls { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 10px; pointer-events: auto; }
+    #throttle-controls button { width: 64px; height: 64px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(10, 30, 46, 0.55); color: #f0b32c; font-size: 24px; touch-action: none; }
+    #mobile-pause { position: fixed; top: 18px; right: 18px; width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(10, 30, 46, 0.55); border: 1px solid rgba(240, 179, 44, 0.35); color: #f0b32c; font-size: 16px; pointer-events: auto; }
+    #compass, #map { display: none; }
+  }
+
+  #armed-badge { position: absolute; top: 155px; right: 18px; display: flex; align-items: center; gap: 8px;
+    background: rgba(10, 30, 46, 0.55); border: 1px solid rgba(62, 168, 255, 0.5); border-radius: 8px; padding: 7px 12px;
+    backdrop-filter: blur(6px); opacity: 0; transition: opacity 0.2s ease; }
+  #armed-badge.show { opacity: 1; }
+  #armed-badge svg { width: 20px; height: 20px; }
+  #armed-badge .armed-bar { width: 56px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden; }
+  #armed-badge .armed-bar-fill { height: 100%; background: #3ea8ff; transform-origin: left; }
+  #achv-btn svg { width: 18px; height: 18px; }
+  #achv-panel { position: fixed; inset: 0; background: rgba(7, 22, 34, 0.78); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center; pointer-events: auto; z-index: 8; }
+  #achv-panel.hidden { display: none; }
+  #achv-panel .achv-box { background: rgba(10, 30, 46, 0.92); border: 1px solid rgba(240, 179, 44, 0.4);
+    border-radius: 14px; padding: 28px 32px; width: min(480px, 90vw); max-height: 76vh; overflow-y: auto; color: #fff; }
+  #achv-panel h2 { font-family: "Pirata One", serif; font-weight: 400; color: #f0b32c; margin: 0 0 16px; font-size: 30px; text-align: center; }
+  .achv-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .achv-row .achv-icon { width: 30px; height: 30px; flex-shrink: 0; }
+  .achv-row .achv-body .achv-name { font-size: 14px; font-weight: 700; }
+  .achv-row .achv-body .achv-desc { font-size: 11.5px; color: rgba(255,255,255,0.55); }
+  .achv-row.locked .achv-body .achv-name, .achv-row.locked .achv-body .achv-desc { color: rgba(255,255,255,0.35); }
+  #achv-close { display: block; margin: 18px auto 0; background: none; border: 1px solid rgba(240,179,44,0.5); color: #f0b32c;
+    border-radius: 8px; padding: 8px 20px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+
+  #compass { position: absolute; bottom: 22px; left: 22px; width: 104px; height: 104px; border-radius: 50%;
+    background: rgba(10, 30, 46, 0.55); border: 1px solid rgba(240, 179, 44, 0.35); backdrop-filter: blur(6px); }
+  #compass-rose { width: 100%; height: 100%; transition: transform 0.1s linear; }
+  #compass::after { content: ""; position: absolute; top: 4px; left: 50%; transform: translateX(-50%);
+    border: 6px solid transparent; border-top-color: #f0b32c; border-width: 8px 5px 0; }
+
+  #map { position: absolute; bottom: 22px; right: 18px; width: 150px; height: 150px; border-radius: 10px;
+    background: rgba(10, 30, 46, 0.55); border: 1px solid rgba(240, 179, 44, 0.35); backdrop-filter: blur(6px); overflow: hidden; }
+  #map canvas { width: 100%; height: 100%; display: block; }
+
+  #combo { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); text-align: center;
+    opacity: 0; transition: opacity 0.2s ease, transform 0.2s ease; pointer-events: none; }
+  #combo.show { opacity: 1; }
+  #combo .combo-x { font-size: 34px; font-weight: 800; color: #ffd76a; text-shadow: 0 2px 10px rgba(0,0,0,0.5); line-height: 1; }
+  #combo .combo-bonus { font-size: 13px; color: #fff; letter-spacing: 0.04em; margin-top: 2px; }
+  #combo .combo-bar { width: 90px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; margin: 6px auto 0; overflow: hidden; }
+  #combo .combo-bar-fill { height: 100%; background: #ffd76a; transform-origin: left; }
+
+  #achievements { position: absolute; top: 18px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .achv-toast { display: flex; align-items: center; gap: 10px; background: rgba(10, 30, 46, 0.85); border: 1px solid rgba(240, 179, 44, 0.55);
+    border-radius: 10px; padding: 10px 16px; color: #fff; opacity: 0; transform: translateY(-14px); transition: opacity 0.35s ease, transform 0.35s ease; }
+  .achv-toast.show { opacity: 1; transform: translateY(0); }
+  .achv-toast .achv-title { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #f0b32c; }
+  .achv-toast .achv-name { font-size: 15px; font-weight: 700; }
+  .achv-toast .achv-desc { font-size: 11px; color: rgba(255,255,255,0.65); }
+
+  .overlay {
+    position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px; background: rgba(7, 22, 34, 0.72); backdrop-filter: blur(4px); color: #fff; cursor: pointer;
+    text-align: center; user-select: none;
+  }
+  .overlay h1 { font-family: "Pirata One", serif; font-weight: 400; font-size: 64px; margin: 0; color: #f0b32c; letter-spacing: 0.02em; }
+  .overlay .sub { font-size: 15px; color: rgba(255,255,255,0.75); max-width: 420px; line-height: 1.5; margin: 0; }
+  .overlay .keys { display: flex; gap: 18px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }
+  .overlay .key { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: rgba(255,255,255,0.65); }
+  .overlay kbd {
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25); border-bottom-width: 3px;
+    border-radius: 6px; padding: 4px 10px; font-size: 14px; font-family: inherit; color: #fff; min-width: 16px;
+  }
+  .overlay .cta { margin-top: 18px; font-size: 14px; color: #f0b32c; letter-spacing: 0.14em; text-transform: uppercase; animation: pulse 2s ease infinite; }
+  @keyframes pulse { 50% { opacity: 0.45; } }
+
+  .rules { display: flex; gap: 28px; margin-top: 6px; flex-wrap: wrap; justify-content: center; max-width: 640px; }
+  .rules .rule-col { text-align: left; font-size: 12.5px; line-height: 1.7; color: rgba(255,255,255,0.75); }
+  .rules .rule-col h3 { margin: 0 0 6px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #f0b32c; }
+  .rules .swatch-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="flash"></div>
+
+<div id="hud" class="hidden">
+  <div id="score-panel" class="panel">
+    <svg viewBox="0 0 24 24" fill="none">
+      <rect x="3" y="10" width="18" height="10" rx="1.5" fill="#8a5a33"/>
+      <path d="M3 10a9 5.5 0 0 1 18 0" fill="#6e4423"/>
+      <rect x="10.6" y="4.5" width="2.8" height="15.5" fill="#f0b32c"/>
+      <rect x="10.2" y="11.5" width="3.6" height="4" rx="0.8" fill="#ffd76a"/>
+    </svg>
+    <div><div id="score">0</div><div id="best"></div></div>
+  </div>
+  <div id="counts-panel" class="panel" style="position:absolute; top:70px; left:18px; display:flex; gap:14px;">
+    <div class="count-item" data-type="pouch"><svg width="16" height="16" viewBox="0 0 24 24"><circle cx="9" cy="14" r="6" fill="#f0d060"/><circle cx="15" cy="10" r="6" fill="#f0d060" stroke="#8a6a1a" stroke-width="1"/><text x="15" y="13" font-size="7" text-anchor="middle" fill="#8a6a1a">$</text></svg><span class="count-num">0</span></div>
+    <div class="count-item" data-type="chest"><svg width="16" height="16" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="9" rx="1.2" fill="#8a5a33"/><path d="M3 11a9 5 0 0 1 18 0" fill="#6e4423"/><rect x="10.5" y="6" width="3" height="14" fill="#c98f1e"/></svg><span class="count-num">0</span></div>
+    <div class="count-item" data-type="jeweled"><svg width="16" height="16" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="9" rx="1.2" fill="#8a5a33"/><path d="M3 11a9 5 0 0 1 18 0" fill="#6e4423"/><rect x="10.5" y="6" width="3" height="14" fill="#9a5ae6"/><path d="M12 8l1.4 2.4L16 11l-2.6.6L12 14l-1.4-2.4L8 11l2.6-.6z" fill="#c9a6f5"/></svg><span class="count-num">0</span></div>
+    <div class="count-item" data-type="crown"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M4 18h16l-1.5-8-3.5 3-3-5-3 5-3.5-3z" fill="#f078be" stroke="#a8477f" stroke-width="0.6"/><circle cx="12" cy="14" r="1.3" fill="#fff"/></svg><span class="count-num">0</span></div>
+  </div>
+  <div id="speed-panel" class="panel"><div id="speed">0.0</div><small>knots</small></div>
+  <div id="lives-panel" class="panel" style="position:absolute; top:120px; right:18px; display:flex; gap:6px;"></div>
+  <div id="armed-badge"><svg viewBox="0 0 24 24"><circle cx="10" cy="14" r="7" fill="#123a5c"/><rect x="9" y="4" width="2" height="4" fill="#5a4a30"/><circle cx="10" cy="4" r="1.6" fill="#3ea8ff"/></svg><div class="armed-bar"><div class="armed-bar-fill"></div></div></div>
+  <div id="compass">
+    <svg id="compass-rose" viewBox="0 0 100 100">
+      <g fill="rgba(255,255,255,0.85)" font-size="13" font-family="system-ui" text-anchor="middle" font-weight="600">
+        <text x="50" y="19">N</text>
+        <text x="84" y="55" fill="rgba(255,255,255,0.5)">E</text>
+        <text x="50" y="90" fill="rgba(255,255,255,0.5)">S</text>
+        <text x="16" y="55" fill="rgba(255,255,255,0.5)">W</text>
+      </g>
+      <g stroke="rgba(255,255,255,0.35)">
+        <line x1="50" y1="24" x2="50" y2="30"/><line x1="50" y1="70" x2="50" y2="76"/>
+        <line x1="24" y1="50" x2="30" y2="50"/><line x1="70" y1="50" x2="76" y2="50"/>
+      </g>
+      <circle cx="50" cy="50" r="3" fill="#f0b32c"/>
+    </svg>
+  </div>
+  <div id="map"><canvas id="map-canvas" width="150" height="150"></canvas></div>
+  <div id="combo">
+    <div class="combo-x">x1</div>
+    <div class="combo-bonus"></div>
+    <div class="combo-bar"><div class="combo-bar-fill"></div></div>
+  </div>
+  <div id="achievements"></div>
+</div>
+
+<div id="achv-btn"><svg viewBox="0 0 24 24"><path fill="#f0b32c" d="M17 4h3a1 1 0 0 1 1 1v1c0 2.2-1.6 4-3.7 4.4A5 5 0 0 1 13 14.9V17h2a1 1 0 0 1 1 1v1H8v-1a1 1 0 0 1 1-1h2v-2.1A5 5 0 0 1 6.7 10.4C4.6 10 3 8.2 3 6V5a1 1 0 0 1 1-1h3V3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1zM7 6H5c0 1.3 1 2.3 2.2 2.4A6 6 0 0 1 7 7V6zm10 0v1a6 6 0 0 1-.2 1.4C18 8.3 19 7.3 19 6h-2z"/></svg>Achievements</div>
+
+<div id="settings-btn"><svg viewBox="0 0 24 24"><path fill="#f0b32c" d="M19.4 13a7.4 7.4 0 0 0 .1-1 7.4 7.4 0 0 0-.1-1l2.1-1.6a.5.5 0 0 0 .1-.6l-2-3.5a.5.5 0 0 0-.6-.2l-2.5 1a7.6 7.6 0 0 0-1.7-1l-.4-2.6a.5.5 0 0 0-.5-.4h-4a.5.5 0 0 0-.5.4l-.4 2.6a7.6 7.6 0 0 0-1.7 1l-2.5-1a.5.5 0 0 0-.6.2l-2 3.5a.5.5 0 0 0 .1.6l2.1 1.6a7.4 7.4 0 0 0 0 2l-2.1 1.6a.5.5 0 0 0-.1.6l2 3.5a.5.5 0 0 0 .6.2l2.5-1a7.6 7.6 0 0 0 1.7 1l.4 2.6a.5.5 0 0 0 .5.4h4a.5.5 0 0 0 .5-.4l.4-2.6a7.6 7.6 0 0 0 1.7-1l2.5 1a.5.5 0 0 0 .6-.2l2-3.5a.5.5 0 0 0-.1-.6zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg></div>
+
+<div id="tutorial-banner"></div>
+
+<div id="kraken-warning"><div class="kw-num">5</div><div class="kw-label">Escape the kraken!</div></div>
+
+<div id="touch-controls">
+  <div id="joystick-base"><div id="joystick-knob"></div></div>
+  <div id="throttle-controls">
+    <button id="btn-accel">▲</button>
+    <button id="btn-brake">▼</button>
+  </div>
+  <button id="mobile-pause">❚❚</button>
+</div>
+
+<div id="settings-panel" class="hidden">
+  <div class="settings-box">
+    <h2>Settings</h2>
+    <div class="settings-row">
+      <label><span>Mouse / Touch Sensitivity</span><span id="sens-val">1.0x</span></label>
+      <input type="range" id="sens-slider" min="0.5" max="2" step="0.1" value="1">
+    </div>
+    <div class="settings-row">
+      <label><span>Volume</span><span id="vol-val">80%</span></label>
+      <input type="range" id="vol-slider" min="0" max="1" step="0.05" value="0.8">
+    </div>
+    <button id="settings-close">Close</button>
+  </div>
+</div>
+
+<div id="achv-panel" class="hidden">
+  <div class="achv-box">
+    <h2>Achievements</h2>
+    <div id="achv-list"></div>
+    <button id="achv-close">Close</button>
+  </div>
+</div>
+
+<div id="start" class="overlay">
+  <h1>Gold Tide</h1>
+  <p class="sub">An endless ocean. A small ship. Floating treasure as far as the spyglass can see. Sail easy, captain.</p>
+  <div class="keys">
+    <div class="key"><kbd>W</kbd>sail</div>
+    <div class="key"><kbd>S</kbd>slow</div>
+    <div class="key"><kbd>A</kbd><span>port</span></div>
+    <div class="key"><kbd>D</kbd><span>starboard</span></div>
+    <div class="key"><kbd>Esc</kbd>pause</div>
+  </div>
+  <div class="cta">Click to set sail</div>
+  <p class="sub" style="font-size:12px;opacity:0.6;margin-top:-6px">Drag with the mouse to look around</p>
+  <div class="rules">
+    <div class="rule-col">
+      <h3>Treasure</h3>
+      <div><svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:-2px;margin-right:6px"><circle cx="9" cy="14" r="6" fill="#f0d060"/><circle cx="15" cy="10" r="6" fill="#f0d060" stroke="#8a6a1a" stroke-width="1"/><text x="15" y="13" font-size="7" text-anchor="middle" fill="#8a6a1a">$</text></svg>Coin Pouch — 1 pt</div>
+      <div><svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:-2px;margin-right:6px"><rect x="3" y="11" width="18" height="9" rx="1.2" fill="#8a5a33"/><path d="M3 11a9 5 0 0 1 18 0" fill="#6e4423"/><rect x="10.5" y="6" width="3" height="14" fill="#c98f1e"/></svg>Chest — 2 pts</div>
+      <div><svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:-2px;margin-right:6px"><rect x="3" y="11" width="18" height="9" rx="1.2" fill="#8a5a33"/><path d="M3 11a9 5 0 0 1 18 0" fill="#6e4423"/><rect x="10.5" y="6" width="3" height="14" fill="#9a5ae6"/><path d="M12 8l1.4 2.4L16 11l-2.6.6L12 14l-1.4-2.4L8 11l2.6-.6z" fill="#c9a6f5"/></svg>Jeweled Chest — 5 pts</div>
+      <div><svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:-2px;margin-right:6px"><path d="M4 18h16l-1.5-8-3.5 3-3-5-3 5-3.5-3z" fill="#f078be" stroke="#a8477f" stroke-width="0.6"/><circle cx="12" cy="14" r="1.3" fill="#fff"/></svg>Crown — 10 pts</div>
+    </div>
+    <div class="rule-col">
+      <h3>Hazards</h3>
+      <div>Ram rocks or islands at speed — lose a life</div>
+      <div>A shark hunts you for 20s every 30s — avoid it or lose a life</div>
+      <div>A kraken marks a red danger zone on the map — stay 5s and it drags you under</div>
+      <div>3 lives total. Lose them all, game over</div>
+      <div>A floating cannonball appears sometimes — grab it to sink the next shark that gets close</div>
+    </div>
+  </div>
+</div>
+
+<div id="pause" class="overlay hidden">
+  <h1>Dropped Anchor</h1>
+  <p class="sub">The sea will wait for you.</p>
+  <div class="cta">Click to resume</div>
+</div>
+
+<div id="gameover" class="overlay hidden">
+  <h1>Shipwrecked</h1>
+  <p class="sub">You struck at full speed and the hull gave out. Treasure collected: <strong id="finalscore">0</strong></p>
+  <div class="cta">Click to sail again</div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "./js/lib/three.module.js" } }
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
