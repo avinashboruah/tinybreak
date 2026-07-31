@@ -500,10 +500,22 @@ const JET_ORDER = ["scout","inter","heavy","harrier","cyclone","vanguard","tempe
 
 // ---- 4-level campaign; difficulty & boss-entrance delay climb per level ----
 const LEVELS = [
-  { n:1, name:"Sky Islands",   sub:"Floating archipelago patrol",    diff:1.0,  bossDelay:8.0,  boss:"DREADNOUGHT" },
-  { n:2, name:"Storm Front",   sub:"Break the Warlord's blockade",   diff:1.4,  bossDelay:10.0, boss:"WARLORD MK II" },
-  { n:3, name:"Ashen Reach",   sub:"Run the volcanic no-fly zone",   diff:1.85, bossDelay:14.0, boss:"OBLIVION" },
-  { n:4, name:"The Void Gate", sub:"Final assault on the Sovereign", diff:2.4,  bossDelay:18.0, boss:"VOID SOVEREIGN" },
+  // L1: forgiving intro — slow bullets, low damage, rare drops but achievable
+  { n:1, name:"Sky Islands",   sub:"Floating archipelago patrol",    diff:1.0,  bossDelay:8.0,
+    bulletSpd:70,  bulletDmg:1.0,  phaseAt1:0.60, phaseAt2:0.30, shieldEvery:40, chargeEvery:10,
+    dropRate:1.0,  boss:"DREADNOUGHT" },
+  // L2: noticeably faster bullets, more damage, boss phases trigger earlier
+  { n:2, name:"Storm Front",   sub:"Break the Warlord's blockade",   diff:1.4,  bossDelay:10.0,
+    bulletSpd:88,  bulletDmg:1.3,  phaseAt1:0.65, phaseAt2:0.35, shieldEvery:32, chargeEvery:8,
+    dropRate:0.8,  boss:"WARLORD MK II" },
+  // L3: fast bullets, high damage, boss becomes aggressive faster, scarce drops
+  { n:3, name:"Ashen Reach",   sub:"Run the volcanic no-fly zone",   diff:1.85, bossDelay:14.0,
+    bulletSpd:108, bulletDmg:1.65, phaseAt1:0.70, phaseAt2:0.40, shieldEvery:24, chargeEvery:6,
+    dropRate:0.6,  boss:"OBLIVION" },
+  // L4: maximum pressure — near-instant bullets, brutal damage, boss phases very early
+  { n:4, name:"The Void Gate", sub:"Final assault on the Sovereign", diff:2.4,  bossDelay:18.0,
+    bulletSpd:130, bulletDmg:2.1,  phaseAt1:0.75, phaseAt2:0.45, shieldEvery:18, chargeEvery:5,
+    dropRate:0.45, boss:"VOID SOVEREIGN" },
 ];
 
 /* ------------------------------ AUDIO (tiny synth) ------------------------ */
@@ -1113,10 +1125,11 @@ function firePlayerBullet(pos,dir,dmg){
   b.userData={vel:dir.clone().multiplyScalar(180), dmg, maxRange, spawnPos:pos.clone(), dist:0};
   scene.add(b); pBullets.push(b);
 }
-function fireEnemyBullet(pos,dir,dmg=8){
+function fireEnemyBullet(pos,dir,spd=70,dmg=8){
   const b=new THREE.Mesh(bulletGeo,eBulletMat); b.scale.set(1.3,1.3,1); b.position.copy(pos);
-  b.userData={vel:dir.clone().multiplyScalar(70),dmg,life:4,age:0}; scene.add(b); eBullets.push(b);
+  b.userData={vel:dir.clone().multiplyScalar(spd),dmg,life:4,age:0}; scene.add(b); eBullets.push(b);
 }
+
 
 /* ------------------------------- COINS / POWERUPS ------------------------- */
 const coins=[], powerups=[];
@@ -1545,6 +1558,9 @@ function flashDamage(){
 const enemies=[]; let boss=null;
 function makeEnemy(type,x,y,z){
   const diff=State.diff||1;
+  const lvlCfg=LEVELS[(State.level||1)-1];
+  const bSpd=lvlCfg.bulletSpd||70;
+  const bDmg=lvlCfg.bulletDmg||1.0;
   let mesh,hp,speed,pattern;
   if(type==="scout"){   mesh=buildScout();   hp=20;  speed=26; pattern="dive"; }
   else if(type==="bomber"){ mesh=buildBomber(); hp=80;  speed=10; pattern="bomber"; }
@@ -1555,6 +1571,7 @@ function makeEnemy(type,x,y,z){
   const e={mesh,type,hp,maxhp:hp,speed,pattern,t:Math.random()*6,
     fireCd:(1+Math.random()*1.5)/(0.8+(diff-1)*0.3),
     bombCd:3+Math.random()*2,
+    bSpd, bDmg,   // per-level bullet config
     hitFlash:0,baseX:x};
   enemies.push(e); return e;
 }
@@ -1578,7 +1595,7 @@ function updateEnemies(dt){
         // drop 2 bombs — spread in X around player
         for(const bx of [-6+Math.random()*12, -6+Math.random()*12]){
           const bdir=new THREE.Vector3(bx*0.05,0,0.8).normalize();
-          fireEnemyBullet(m.position.clone().add(new THREE.Vector3(bx*0.3,-0.8,0)),bdir,14);
+          fireEnemyBullet(m.position.clone().add(new THREE.Vector3(bx*0.3,-0.8,0)),bdir,e.bSpd||70, Math.round(8*(e.bDmg||1)));
         }
       }
     } else if(e.pattern==="gunship"){
@@ -1594,7 +1611,7 @@ function updateEnemies(dt){
         for(const ox of [1.8,-1.8]){
           const sp=p.clone().add(new THREE.Vector3(ox*0.65,-0.3,0));
           const dir=new THREE.Vector3(Player.x-sp.x, Player.y-sp.y, 0-sp.z).normalize();
-          fireEnemyBullet(sp,dir,11);
+          fireEnemyBullet(sp,dir,e.bSpd||70, Math.round(8*(e.bDmg||1)));
         }
       }
     } else { // strafe fighter
@@ -1605,7 +1622,7 @@ function updateEnemies(dt){
       if(e.fireCd<=0 && m.position.z<-8 && m.position.z>-90){
         e.fireCd=(1.4+Math.random())/(0.8+((State.diff||1)-1)*0.3);
         const dir=new THREE.Vector3(Player.x-m.position.x,Player.y-m.position.y,0-m.position.z).normalize();
-        fireEnemyBullet(m.position.clone(),dir,9);
+        fireEnemyBullet(m.position.clone(),dir,e.bSpd||70, Math.round(8*(e.bDmg||1)));
       }
     }
     if(e.hitFlash>0){ e.hitFlash-=dt; m.children.forEach(c=>c.material.emissive&&c.material.emissive.setScalar(e.hitFlash>0?0.6:0)); }
@@ -1633,8 +1650,9 @@ function hitEnemy(e,dmg,pos){
     const drops=e.type==="scout"?1:e.type==="bomber"?5:3;
     for(let k=0;k<drops;k++) spawnCoin(e.mesh.position);
     spawnScrap(e.mesh.position, e.type==="scout"?1:e.type==="bomber"?4:2);
-    if(Math.random()<(e.type==="scout"?0.06:0.18)) spawnPowerup(e.mesh.position.clone());
-    if(Math.random()<(e.type==="scout"?0.015:0.05)) spawnHealth(e.mesh.position.clone());
+    const dr=LEVELS[(State.level||1)-1].dropRate||1.0;
+    if(Math.random()<(e.type==="scout"?0.06:0.18)*dr) spawnPowerup(e.mesh.position.clone());
+    if(Math.random()<(e.type==="scout"?0.015:0.05)*dr) spawnHealth(e.mesh.position.clone());
     // score
     const pts=e.type==="scout"?100:e.type==="bomber"?400:e.type==="gunship"?300:250;
     // EMP ring upgrade
@@ -1679,10 +1697,20 @@ function spawnBoss(level){
   // Scale boss HP by number of Forge upgrades player has — a fully-upgraded player faces a meaningfully tougher boss
   const forgeBonus = 1 + Math.max(0, Forge.level) * 0.18;
   const scaledHp = Math.round(conf.hp * forgeBonus);
+  const lvlCfg = LEVELS[level-1];
   boss={mesh, hp:scaledHp, maxhp:scaledHp, stage:level, baseY:conf.y, diff:meta.diff,
         t:0, phase:0, fireCd:2.5, moveCd:0, tx:0, hitFlash:0, entering:true,
-        enemySpawnCd:5.0, shieldCd:40, shieldActive:0, chargeCd:0, chargeZ:-42,
-        rageChargeCd:0, enterT:0};
+        enemySpawnCd:5.0,
+        shieldCd:lvlCfg.shieldEvery||40,   shieldActive:0,
+        chargeCd:0, chargeZ:-42,
+        rageChargeCd:lvlCfg.chargeEvery||10,
+        phaseAt1:lvlCfg.phaseAt1||0.60,
+        phaseAt2:lvlCfg.phaseAt2||0.30,
+        shieldEvery:lvlCfg.shieldEvery||40,
+        chargeEvery:lvlCfg.chargeEvery||10,
+        bSpd:lvlCfg.bulletSpd||70,
+        bDmg:lvlCfg.bulletDmg||1.0,
+        enterT:0};
   mesh.position.set(0,conf.y,-140); mesh.rotation.y=Math.PI; scene.add(mesh);
   Sound.boss(); HUD.showToast(level>=4?'FINAL BOSS INCOMING':'BOSS INCOMING');
   document.getElementById('boss-name').textContent=meta.boss;
@@ -1717,17 +1745,16 @@ function updateBoss(dt){
 
   const hpFrac=boss.hp/boss.maxhp;
 
-  // --- Phase transitions ---
-  if(boss.phase===0 && hpFrac<0.6){
-    boss.phase=1;   // Overdrive phase
+  // --- Phase transitions (thresholds differ per level) ---
+  if(boss.phase===0 && hpFrac<boss.phaseAt1){
+    boss.phase=1;
     boss.moveCd=0;
     HUD.showToast('OVERDRIVE MODE');
-    // flash body red
     m.traverse(c=>{ if(c.material && c.material.emissive) c.material.emissive.setHex(0x440000); });
   }
-  if(boss.phase===1 && hpFrac<0.3){
-    boss.phase=2;   // Rage phase
-    boss.moveCd=0; boss.rageChargeCd=4;
+  if(boss.phase===1 && hpFrac<boss.phaseAt2){
+    boss.phase=2;
+    boss.moveCd=0; boss.rageChargeCd=boss.chargeEvery||10;
     HUD.showToast('RAGE — BRACE!');
     m.traverse(c=>{ if(c.material && c.material.emissive) c.material.emissive.setHex(0x880000); });
   }
@@ -1735,7 +1762,7 @@ function updateBoss(dt){
   // --- Shield pulse (immune every 40s for 3s) ---
   boss.shieldCd-=dt;
   if(boss.shieldCd<=0 && boss.shieldActive<=0){
-    boss.shieldActive=3.0; boss.shieldCd=40;
+    boss.shieldActive=3.0; boss.shieldCd=boss.shieldEvery||40;
     HUD.showToast('SHIELD ACTIVE!');
     m.traverse(c=>{ if(c.material) c.material.transparent=true; });
   }
@@ -1770,9 +1797,8 @@ function updateBoss(dt){
   if(boss.phase>=2){
     boss.rageChargeCd-=dt;
     if(boss.rageChargeCd<=0){
-      boss.rageChargeCd = 8+Math.random()*5;
-      // Lunge toward player (Z charge)
-      boss.chargeZ = -20;   // push close
+      boss.rageChargeCd = (boss.chargeEvery||10)+Math.random()*4;
+      boss.chargeZ = -20;
       setTimeout(()=>{ if(boss) boss.chargeZ=-42; }, 1200);
     }
   }
@@ -1803,37 +1829,36 @@ function updateBoss(dt){
     boss.fireCd=interval;
     const patMax = boss.phase===2?4 : boss.phase===1?3 : 2;
     const pat=(Math.random()*patMax)|0;
-    if(pat===0){ // spread fan — wider in rage
+    if(pat===0){
       const spread = boss.phase>=2 ? 4 : boss.phase===1 ? 3 : 2;
       for(let a=-spread;a<=spread;a++){
         const dir=new THREE.Vector3(a*0.14+(Player.x-m.position.x)*0.012,-0.04,1).normalize();
-        fireEnemyBullet(m.position.clone(),dir,12);
+        fireEnemyBullet(m.position.clone(),dir,boss.bSpd||70, Math.round(8*(boss.bDmg||1)));
       }
-    } else if(pat===1){ // aimed burst from wings
+    } else if(pat===1){
       [[6,0,0],[-6,0,0]].forEach(off=>{
         const p=m.position.clone().add(new THREE.Vector3(off[0]*0.9,0,3));
         const dir=new THREE.Vector3(Player.x-p.x,Player.y-p.y,0-p.z).normalize();
-        fireEnemyBullet(p,dir,10+(boss.phase*3));
+        fireEnemyBullet(p,dir,(boss.bSpd||70)+(boss.phase*8), Math.round((10+(boss.phase*3))*(boss.bDmg||1)));
       });
-    } else if(pat===2){ // radial ring
+    } else if(pat===2){
       const rays=boss.phase>=2?12:8;
-      for(let a=0;a<rays;a++){ const ang=a/rays*Math.PI*2; fireEnemyBullet(m.position.clone(),new THREE.Vector3(Math.cos(ang),Math.sin(ang)*0.5,0.7).normalize(),9); }
-    } else { // rage exclusive: tracking triple-burst
+      for(let a=0;a<rays;a++){ const ang=a/rays*Math.PI*2; fireEnemyBullet(m.position.clone(),new THREE.Vector3(Math.cos(ang),Math.sin(ang)*0.5,0.7).normalize(),boss.bSpd||70, Math.round(8*(boss.bDmg||1))); }
+    } else {
       for(let s=0;s<3;s++){
         setTimeout(()=>{
           if(!boss||boss.shieldActive>0)return;
           const dir=new THREE.Vector3(Player.x-m.position.x,Player.y-m.position.y,0-m.position.z).normalize();
           dir.x+=(Math.random()-0.5)*0.15; dir.y+=(Math.random()-0.5)*0.1;
-          fireEnemyBullet(m.position.clone(),dir,15);
+          fireEnemyBullet(m.position.clone(),dir,(boss.bSpd||70)+20, Math.round(15*(boss.bDmg||1)));
         },s*140);
       }
     }
-    // stage 2+: extra aimed twin-cannon volley
     if(boss.stage>=2){
       for(const sv of [1,-1]){
         const p=m.position.clone().add(new THREE.Vector3(sv*4.6,0.6,-6));
         const dir=new THREE.Vector3(Player.x-p.x,Player.y-p.y,0-p.z).normalize();
-        fireEnemyBullet(p,dir,14);
+        fireEnemyBullet(p,dir,(boss.bSpd||70)+10, Math.round(14*(boss.bDmg||1)));
       }
     }
   }
