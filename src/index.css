@@ -474,3 +474,51 @@ a {
   60% { transform: scale(1.06); opacity: 1; }
   100% { transform: scale(1); }
 }
+
+/* Minimal Floating Close Button for Fullscreen Game Window */
+.game-close-btn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #f8c1ba; /* Playful soft pink/red from theme */
+  border: 3px solid #1a1a1a;
+  box-shadow: 4px 4px 0 #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10000;
+  color: #1a1a1a;
+  outline: none;
+  opacity: 0.5;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.25),
+              box-shadow 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.25),
+              background-color 0.2s ease,
+              opacity 0.2s ease;
+}
+
+.game-close-btn:hover {
+  opacity: 1;
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 6px 6px 0 #1a1a1a;
+  background: #ffb0a5;
+}
+
+.game-close-btn:active {
+  transform: translateY(1px) scale(0.95);
+  box-shadow: 1px 1px 0 #1a1a1a;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+

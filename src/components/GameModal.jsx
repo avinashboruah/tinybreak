@@ -1,8 +1,16 @@
-import { X, Maximize2, Minimize2 } from 'lucide-react';
-import { useState } from 'react';
+import { X } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function GameModal({ game, onClose }) {
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   if (!game) return null;
 
@@ -18,121 +26,29 @@ export default function GameModal({ game, onClose }) {
       width: '100vw',
       height: '100vh',
       zIndex: 9999,
-      display: 'flex',
-      alignItems: isFullscreen ? 'stretch' : 'center',
-      justifyContent: 'center',
-      background: isFullscreen ? '#1a1a1a' : 'rgba(26, 26, 42, 0.7)',
-      backdropFilter: isFullscreen ? 'none' : 'blur(8px)',
-      animation: 'fadeIn 0.2s ease-out'
+      background: '#1a1a1a',
+      animation: 'fadeIn 0.2s ease-out',
+      overflow: 'hidden'
     }}>
-      {/* Modal Container */}
-      <div style={{
-        background: '#f9f5f2',
-        border: isFullscreen ? 'none' : '3px solid #1a1a1a',
-        borderRadius: isFullscreen ? 0 : 24,
-        width: isFullscreen ? '100vw' : '880px',
-        height: isFullscreen ? '100vh' : '640px',
-        maxWidth: '100vw',
-        maxHeight: '100vh',
-        boxShadow: isFullscreen ? 'none' : '8px 8px 0 #1a1a1a',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-      }}>
-        {/* Modal Header */}
-        <div style={{
-          background: '#61609a',
-          borderBottom: '3px solid #1a1a1a',
-          padding: '14px 24px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          color: '#f9f5f2'
-        }}>
-          <div>
-            <span style={{
-              background: '#f4ed36',
-              color: '#1a1a1a',
-              border: '2px solid #1a1a1a',
-              borderRadius: '999px',
-              padding: '2px 10px',
-              fontSize: '11px',
-              fontWeight: 700,
-              marginRight: '12px',
-              textTransform: 'uppercase'
-            }}>{game.genre}</span>
-            <span style={{
-              fontFamily: 'Sora, sans-serif',
-              fontWeight: 700,
-              fontSize: '18px'
-            }}>{game.title}</span>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <button
-              onClick={() => setIsFullscreen(!isFullscreen)}
-              style={{
-                background: 'rgba(255, 255, 255, 0.15)',
-                border: '2px solid #1a1a1a',
-                borderRadius: '50%',
-                width: 36,
-                height: 36,
-                display: 'grid',
-                placeItems: 'center',
-                cursor: 'pointer',
-                color: '#f9f5f2',
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)'}
-            >
-              {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-            </button>
-            <button
-              onClick={onClose}
-              style={{
-                background: '#f8c1ba',
-                border: '2px solid #1a1a1a',
-                borderRadius: '50%',
-                width: 36,
-                height: 36,
-                display: 'grid',
-                placeItems: 'center',
-                cursor: 'pointer',
-                color: '#1a1a1a',
-                transition: 'all 0.2s',
-                boxShadow: '1px 1px 0 #1a1a1a'
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.transform = 'scale(1.05)';
-                e.currentTarget.style.boxShadow = '2px 2px 0 #1a1a1a';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.transform = 'scale(1)';
-                e.currentTarget.style.boxShadow = '1px 1px 0 #1a1a1a';
-              }}
-            >
-              <X size={18} strokeWidth={2.5} />
-            </button>
-          </div>
-        </div>
-
-        {/* Modal Iframe Wrapper */}
-        <div style={{ flex: 1, position: 'relative', background: '#1a1a1a' }}>
-          <iframe
-            src={gamePath}
-            title={game.title}
-            style={{
-              width: '100%',
-              height: '100%',
-              border: 'none',
-              display: 'block'
-            }}
-            allow="fullscreen"
-          />
-        </div>
-      </div>
+      <iframe
+        src={gamePath}
+        title={game.title}
+        style={{
+          width: '100%',
+          height: '100%',
+          border: 'none',
+          display: 'block'
+        }}
+        allow="fullscreen"
+      />
+      <button
+        onClick={onClose}
+        className="game-close-btn"
+        title="Exit Game (Esc)"
+      >
+        <X size={20} strokeWidth={3} />
+      </button>
     </div>
   );
 }
+
