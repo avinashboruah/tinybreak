@@ -21,15 +21,10 @@ export default function Hero({ setCurrentView }) {
           opacity: 0.9, margin: '0 0 44px', maxWidth: '44ch',
         }}>Low-poly adventures, tiny puzzles, relaxing games, and quick browser experiences.</p>
 
-        <div style={{ display: 'flex', gap: 16 }}>
+        <div className="hero-buttons-container" style={{ display: 'flex', gap: 16 }}>
           <button
             onClick={() => setCurrentView('games')}
-            style={{
-              background: '#f4ed36', color: '#000',
-              border: '2px solid #1a1a1a', borderRadius: 999,
-              padding: '16px 36px', fontFamily: "'IBM Plex Sans', sans-serif",
-              fontWeight: 600, fontSize: 18, cursor: 'pointer', transition: 'transform 200ms',
-            }}
+            className="hero-btn hero-btn-primary"
             onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
             onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
             onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
@@ -42,12 +37,7 @@ export default function Hero({ setCurrentView }) {
                 document.getElementById('nav-search-input')?.focus();
               }, 50);
             }}
-            style={{
-              background: '#f9f5f2', color: '#000',
-              border: '2px solid #1a1a1a', borderRadius: 999,
-              padding: '16px 36px', fontFamily: "'IBM Plex Sans', sans-serif",
-              fontWeight: 600, fontSize: 18, cursor: 'pointer', transition: 'transform 200ms',
-            }}
+            className="hero-btn hero-btn-secondary"
             onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
             onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
           >Browse Games</button>

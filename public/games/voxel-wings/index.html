@@ -48,7 +48,7 @@
   .head{font-family:"Russo One",sans-serif;letter-spacing:.5px}
   /* ---------- shared overlay ---------- */
   .screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;
-    z-index:20;padding:24px;text-align:center;
+    z-index:20;padding:24px;text-align:center;overflow-y:auto;
     background:radial-gradient(120% 90% at 50% 15%, rgba(30,90,150,.35), rgba(6,14,28,.86) 70%);
     backdrop-filter:blur(2px);opacity:0;transform:translateY(12px);transition:opacity .38s ease,transform .38s ease;pointer-events:none}
   .screen.on{display:flex;opacity:1;transform:translateY(0);pointer-events:auto;animation:none}
@@ -115,7 +115,7 @@
   .sp-key{font-size:10px;color:#9fc2e6;display:flex;align-items:center;gap:5px}
   .sp-key kbd{font-size:9px;padding:1px 5px}
   /* ---- Forge Bar ---- */
-  #forge-bar-wrap{position:absolute;bottom:92px;left:50%;transform:translateX(-50%);display:none;flex-direction:column;align-items:center;gap:4px;pointer-events:none}
+  #forge-bar-wrap{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);display:none;flex-direction:column;align-items:center;gap:4px;pointer-events:none}
   #forge-bar-wrap.on{display:flex}
   .forge-lbl{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#00f0c8;text-shadow:0 0 8px #00f0c8;font-family:"Russo One"}
   .forge-track{width:min(220px,50vw);height:11px;border-radius:6px;background:rgba(0,0,0,.5);border:1px solid rgba(0,240,200,.28);overflow:hidden}
@@ -126,7 +126,7 @@
   #forge-cards.on{display:flex}
   #forge-cards.visible{opacity:1}
   #continue-offer{position:fixed;inset:0;z-index:45;display:none;flex-direction:column;align-items:center;justify-content:center;
-    padding:24px;text-align:center;background:radial-gradient(120% 90% at 50% 15%, rgba(150,20,20,.35), rgba(6,14,28,.9) 70%);
+    padding:24px;text-align:center;overflow-y:auto;background:radial-gradient(120% 90% at 50% 15%, rgba(150,20,20,.35), rgba(6,14,28,.9) 70%);
     backdrop-filter:blur(3px);opacity:0;transition:opacity .3s ease}
   #continue-offer.on{display:flex;opacity:1}
   .forge-title{font-family:"Russo One";font-size:clamp(18px,4vw,34px);letter-spacing:4px;text-transform:uppercase;color:#00f0c8;text-shadow:0 0 18px #00f0c8;
@@ -152,7 +152,7 @@
   .sp-badge.ready .sp-ic-img{background:var(--gold)}
   .sp-tag{display:flex;align-items:center;gap:6px;justify-content:center;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
   .sp-tag-ic{width:13px;height:13px;background:var(--gold);flex:none}
-  .pw-row{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:10px}
+  .pw-row{position:absolute;bottom:18px;right:18px;display:flex;flex-direction:row-reverse;gap:10px}
   .pw{width:56px;height:56px;border-radius:14px;background:var(--panel);border:1px solid var(--panelb);
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;position:relative;overflow:hidden}
   .pw .ic{width:22px;height:22px;filter:drop-shadow(0 0 4px rgba(0,0,0,.5))}.pw .nm{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:#cfe6ff}
@@ -168,13 +168,16 @@
 
   .toast{position:absolute;top:34%;left:50%;transform:translateX(-50%);font-family:"Russo One";font-size:clamp(22px,5vw,44px);
     text-transform:uppercase;color:#fff;text-shadow:0 3px 0 #1b4d80,0 6px 18px #000;opacity:0;letter-spacing:2px;white-space:nowrap}
+  /* Frequent in-combat micro-feedback (weak-point reminder, shield block) shouldn't be as loud as rare
+     dramatic beats like BOSS INCOMING — same toast, smaller and quieter so it doesn't obscure the fight. */
+  .toast.small{font-size:15px;letter-spacing:1px;top:26%;text-shadow:0 2px 0 #1b4d80,0 3px 8px #000}
   .toast.pop{animation:toast 1.1s ease forwards}
   @keyframes toast{0%{opacity:0;transform:translateX(-50%) scale(.6)}18%{opacity:1;transform:translateX(-50%) scale(1.08)}
     35%{transform:translateX(-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translateX(-50%) scale(1) translateY(-30px)}}
   .crit-pop{position:absolute;top:0;left:0;transform:translate(-50%,-50%) scale(0.7);font-family:"Russo One";
-    font-size:15px;letter-spacing:1px;color:#ffb14a;text-shadow:0 2px 6px #000,0 0 10px rgba(255,177,74,.8);
+    font-size:10px;letter-spacing:0.5px;color:#ffb14a;text-shadow:0 1px 3px #000,0 0 5px rgba(255,177,74,.7);
     pointer-events:none;opacity:0;transition:opacity .22s ease,transform .3s cubic-bezier(.34,1.56,.64,1)}
-  .crit-pop.show{opacity:1;transform:translate(-50%,-120%) scale(1.15)}
+  .crit-pop.show{opacity:1;transform:translate(-50%,-120%) scale(1)}
   .enemy-hpbar{position:absolute;top:0;left:0;width:44px;height:6px;border-radius:3px;background:rgba(0,0,0,.55);
     border:1px solid rgba(255,255,255,.25);transform:translate(-50%,-100%);pointer-events:none;display:none;overflow:hidden}
   .enemy-hpbar i{display:block;height:100%;background:linear-gradient(90deg,#ff8a5b,#ff5b6e);transition:width .1s ease}
@@ -326,6 +329,58 @@
     input[type=range] { width: 100px; }
     .rules-box { font-size: 11px !important; padding: 10px !important; margin-top: 12px !important; }
     .rules-box h3 { font-size: 13px !important; margin-bottom: 6px !important; }
+  }
+
+  /* Landscape phones are wide but SHORT (e.g. 667x375) — since portrait is locked out, this height
+     constraint, not narrow width, is the real mobile case. Compact the vertical rhythm so every screen
+     fits without relying on the overflow-y:auto fallback above. */
+  @media(max-height: 480px) {
+    .screen { padding: 8px; }
+    .logo { font-size: 26px !important; letter-spacing: 1px; }
+    .sub { font-size: 11px; margin-top: 4px; }
+    .coinbadge { margin-top: 4px; padding: 5px 12px; font-size: 14px; }
+    .btns { margin-top: 10px; gap: 6px; }
+    .btn { padding: 8px 16px; font-size: 13px; border-radius: 8px; }
+    .daily-best { margin-top: 6px; font-size: 10px; }
+    .tip { margin-top: 8px; font-size: 10px; }
+
+    /* HUD */
+    .hud-tl, .hud-tr { top: 8px; }
+    .hud-tl { left: 10px; } .hud-tr { right: 10px; }
+    .bar { width: 100px; height: 10px; }
+    .score { font-size: 20px; }
+    .coins-hud { font-size: 15px; }
+    .boss-wrap { top: 78px; } /* must clear .hud-tr, which is taller than .hud-tl once score+coins+streak stack */
+
+    /* Hangar */
+    .hangar { max-height: 96vh; }
+    .h-head { margin-bottom: 6px; }
+    .cstage { height: 110px; }
+    .cbtn { width: 32px; height: 32px; font-size: 18px; }
+    .cinfo { margin-top: 4px; gap: 2px; }
+    .cinfo h2 { font-size: 16px; }
+    .cstats { margin-top: 2px; gap: 6px; }
+    .cdots { margin-top: 4px; }
+    .cbuy { margin-top: 4px; }
+
+    /* Level select */
+    .levelgrid { gap: 6px; margin-top: 8px; }
+    .levelcard { padding: 6px 10px; gap: 8px; }
+    .levelcard .lv-num { font-size: 20px; width: 26px; }
+    .levelcard h3 { font-size: 13px; }
+    .lv-sub { font-size: 9px; margin: 0; }
+    .lv-diff { display: none; } /* threat-dot row is decorative — first to go when space is tight */
+
+    /* Settings */
+    .settings { gap: 6px; margin-top: 8px; }
+    .setrow { padding: 6px 10px; }
+    .rules-box { font-size: 10px !important; padding: 8px !important; margin-top: 8px !important; max-height: 100px; overflow-y: auto; }
+    .rules-box h3 { font-size: 11px !important; margin-bottom: 4px !important; }
+
+    /* Game-over screen */
+    .go-stats { margin: 12px 0 2px; gap: 20px; }
+    .go-stat .v { font-size: 22px; }
+    .rank .star { font-size: 30px; }
   }
 </style>
 </head>
@@ -2210,7 +2265,7 @@ function hitBoss(dmg,pos){
   // Shield absorbs all damage
   if(boss.shieldActive>0){
     spawnHitSpark(pos); addShake(0.1);
-    HUD.showToast('SHIELDED!');
+    HUD.showToast('SHIELDED!', true);
     return;
   }
   // Weak-point vs body damage: check if hit pos is near a weak point mesh
@@ -2223,7 +2278,7 @@ function hitBoss(dmg,pos){
   }
   const finalDmg = isWeakPoint ? dmg : Math.round(dmg*0.30);
   boss.hp-=finalDmg; boss.hitFlash=0.08; spawnHitSpark(pos);
-  if(!isWeakPoint && Math.random()<0.4) HUD.showToast('AIM FOR WEAK POINTS!');
+  if(!isWeakPoint && Math.random()<0.4) HUD.showToast('AIM FOR WEAK POINTS!', true);
   // lower chance/power than before — at rapid fire rates this was triggering (and shaking the screen) almost every hit
   if(Math.random()<0.15) spawnExplosion(pos,0xffb14a,4,0.4);
   // Critical hit-confirm juice — throttled so rapid weak-point fire doesn't spam hit-stops back to back.
@@ -2663,7 +2718,7 @@ const HUD = {
       ring.style.setProperty("--p","100%"); cdEl.textContent=""; b.classList.add("ready");
     }
   },
-  showToast(txt){ const t=document.getElementById("toast"); t.textContent=txt; t.classList.remove("pop"); void t.offsetWidth; t.classList.add("pop"); },
+  showToast(txt, small){ const t=document.getElementById("toast"); t.textContent=txt; t.classList.remove("pop"); t.classList.toggle("small",!!small); void t.offsetWidth; t.classList.add("pop"); },
 };
 
 /* ============================================================================

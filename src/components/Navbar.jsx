@@ -1,6 +1,9 @@
-import { Search } from 'lucide-react';
+import { useState } from 'react';
+import { Search, Menu, X } from 'lucide-react';
 
 export default function Navbar({ onRandomGame, searchQuery, setSearchQuery, currentView, setCurrentView }) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
     <nav className="navbar-container" style={{
       position: 'sticky', top: 0, zIndex: 50,
@@ -12,6 +15,7 @@ export default function Navbar({ onRandomGame, searchQuery, setSearchQuery, curr
         <div 
           onClick={() => {
             setCurrentView('home');
+            setIsMobileMenuOpen(false);
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}
@@ -27,7 +31,7 @@ export default function Navbar({ onRandomGame, searchQuery, setSearchQuery, curr
         </div>
 
         {/* Search bar inside navigation */}
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+        <div className="nav-search-wrapper" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
           <Search size={18} style={{
             position: 'absolute', left: 14, color: '#1a1a1a', opacity: 0.6,
             pointerEvents: 'none'
@@ -96,6 +100,73 @@ export default function Navbar({ onRandomGame, searchQuery, setSearchQuery, curr
           className="pulse-button nav-random-btn"
         >🎲 Random Game</button>
       </div>
+
+      {/* Hamburger menu button */}
+      <button 
+        className="nav-hamburger-btn"
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        aria-label="Toggle navigation menu"
+      >
+        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      {/* Mobile Menu Panel */}
+      {isMobileMenuOpen && (
+        <div className="mobile-menu-dropdown">
+          <button 
+            onClick={() => { 
+              setCurrentView('home'); 
+              setIsMobileMenuOpen(false); 
+              window.scrollTo({ top: 0, behavior: 'smooth' }); 
+            }} 
+            className="mobile-menu-link"
+          >
+            Home
+          </button>
+          <button 
+            onClick={() => { 
+              setCurrentView('games'); 
+              setIsMobileMenuOpen(false); 
+            }} 
+            className="mobile-menu-link"
+          >
+            Games
+          </button>
+          <a 
+            href="#journal" 
+            onClick={() => { 
+              setCurrentView('home'); 
+              setIsMobileMenuOpen(false); 
+            }} 
+            className="mobile-menu-link"
+          >
+            Journal
+          </a>
+          <button 
+            onClick={() => { 
+              setCurrentView('about'); 
+              setIsMobileMenuOpen(false); 
+              window.scrollTo({ top: 0, behavior: 'smooth' }); 
+            }} 
+            className="mobile-menu-link"
+          >
+            About
+          </button>
+          <button
+            onClick={() => {
+              onRandomGame();
+              setIsMobileMenuOpen(false);
+              if (currentView !== 'games') {
+                setCurrentView('games');
+              }
+            }}
+            className="pulse-button nav-random-btn"
+            style={{ width: '100%', marginTop: 8 }}
+          >
+            🎲 Random Game
+          </button>
+        </div>
+      )}
     </nav>
   );
 }
