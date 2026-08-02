@@ -1,7 +1,7 @@
 export default function WhyPlay({ items }) {
   return (
     <section id="about" style={{ maxWidth: 1180, margin: '0 auto', padding: '0 40px 64px' }}>
-      <h2 style={{ fontFamily: 'Sora, sans-serif', fontWeight: 700, fontSize: 32, margin: '0 0 28px', color: '#f9f5f2' }}>
+      <h2 className="section-heading">
         Why tinybreak?
       </h2>
       <div className="grid-responsive-3">

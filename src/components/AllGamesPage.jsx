@@ -12,7 +12,7 @@ export default function AllGamesPage({ games, categories, activeCategory, setAct
   return (
     <div style={{ maxWidth: 1180, margin: '0 auto', padding: '40px 40px 80px' }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 32 }}>
-        <h1 style={{ fontFamily: 'Sora, sans-serif', fontWeight: 800, fontSize: 42, color: '#f9f5f2', margin: 0 }}>
+        <h1 className="explore-heading">
           Explore Games
         </h1>
         <p style={{ fontSize: 16, color: '#f9f5f2', opacity: 0.8, fontFamily: "'IBM Plex Sans', sans-serif" }}>
@@ -87,80 +87,57 @@ export default function AllGamesPage({ games, categories, activeCategory, setAct
           <p style={{ opacity: 0.7, margin: 0 }}>Try clearing your search query or choosing another category.</p>
         </div>
       ) : (
-        <div className="grid-responsive-4">
+        <div className="game-icons-grid">
           {filtered.map((g, index) => {
             return (
               <div
                 key={g.title}
                 onClick={() => onPlayGame(g)}
-                className="card-entrance"
+                className="game-icon-card card-entrance"
                 style={{
-                  background: '#f9f5f2',
-                  border: '2px solid #1a1a1a',
-                  borderRadius: 20,
-                  overflow: 'hidden',
-                  transition: 'transform 200ms, box-shadow 200ms',
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 0 #1a1a1a',
-                  animationDelay: `${index * 0.05}s`
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.transform = 'translateY(-6px)';
-                  e.currentTarget.style.boxShadow = '0 10px 0 #1a1a1a';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 0 #1a1a1a';
+                  animationDelay: `${index * 0.04}s`
                 }}
               >
-                {/* Game Card Cover */}
-                <div style={{
-                  height: 140,
-                  background: g.cover,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat',
-                  borderBottom: '2px solid #1a1a1a',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}>
+                {/* Game Icon Box */}
+                <div 
+                  className="game-icon-box"
+                  style={{
+                    background: g.cover,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                >
                   <div className={g.pattern} />
+                  
+                  {/* Central Badge containing the Lucide icon */}
+                  <div className="game-icon-badge">
+                    {g.icon ? <g.icon size={22} color="#1a1a1a" strokeWidth={2.5} /> : null}
+                  </div>
+
+                  {/* 2P badge overlay */}
+                  {g.multiplayer && (
+                    <span style={{
+                      position: 'absolute',
+                      top: 6,
+                      right: 6,
+                      background: '#f9cc73',
+                      border: '1.5px solid #1a1a1a',
+                      borderRadius: 999,
+                      padding: '1px 5px',
+                      fontFamily: "'IBM Plex Sans', sans-serif",
+                      fontSize: 9,
+                      fontWeight: 800,
+                      color: '#1a1a1a',
+                      zIndex: 3,
+                      boxShadow: '1px 1px 0 #1a1a1a',
+                    }}>2P</span>
+                  )}
                 </div>
 
-                {/* Game Card Footer Info */}
-                <div style={{ padding: '16px 16px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                    <h3 style={{ fontFamily: 'Sora, sans-serif', fontWeight: 700, fontSize: 16, margin: 0, color: '#1a1a1a' }}>{g.title}</h3>
-                    {g.multiplayer && (
-                      <span style={{
-                        background: '#f9cc73', border: '1.5px solid #1a1a1a',
-                        borderRadius: 999, padding: '2px 9px',
-                        fontFamily: "'IBM Plex Sans', sans-serif", fontSize: 11,
-                        fontWeight: 700, whiteSpace: 'nowrap', color: '#1a1a1a',
-                        flexShrink: 0,
-                      }}>2P</span>
-                    )}
-                  </div>
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: 6,
-                    fontFamily: "'IBM Plex Sans', sans-serif", fontSize: 13, color: '#61609a',
-                  }}>
-                    <span>{g.genre}</span>
-                    <span style={{ width: 3, height: 3, background: '#61609a', borderRadius: '50%', display: 'inline-block', flexShrink: 0 }} />
-                    <span>Fatigue {g.fatigue || 3}/10</span>
-                  </div>
-                  <button
-                    style={{
-                      background: '#f4ed36', color: '#000',
-                      border: '2px solid #1a1a1a', borderRadius: 999,
-                      padding: '10px 0', width: '100%',
-                      fontFamily: "'IBM Plex Sans', sans-serif",
-                      fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                      transition: 'transform 200ms', marginTop: 4,
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.04)'}
-                    onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-                  >Play</button>
+                {/* Game Title & Genre Info below */}
+                <div>
+                  <h3 className="game-icon-title">{g.title}</h3>
+                  <div className="game-icon-meta">{g.genre}</div>
                 </div>
               </div>
             );

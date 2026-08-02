@@ -55,7 +55,7 @@ export default function Hero({ setCurrentView }) {
       </div>
 
       {/* Lottie animation — fixed sizing */}
-      <div style={{
+      <div className="hero-lottie-container" style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

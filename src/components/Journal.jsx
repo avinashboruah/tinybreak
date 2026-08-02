@@ -1,7 +1,7 @@
 export default function Journal({ posts }) {
   return (
     <section id="journal" style={{ maxWidth: 1180, margin: '0 auto', padding: '0 40px 80px' }}>
-      <h2 style={{ fontFamily: 'Sora, sans-serif', fontWeight: 700, fontSize: 32, margin: '0 0 28px', color: '#f9f5f2' }}>
+      <h2 className="section-heading">
         From the journal
       </h2>
       <div className="grid-responsive-3">
