@@ -170,7 +170,7 @@
     text-transform:uppercase;color:#fff;text-shadow:0 3px 0 #1b4d80,0 6px 18px #000;opacity:0;letter-spacing:2px;white-space:nowrap}
   /* Frequent in-combat micro-feedback (weak-point reminder, shield block) shouldn't be as loud as rare
      dramatic beats like BOSS INCOMING — same toast, smaller and quieter so it doesn't obscure the fight. */
-  .toast.small{font-size:15px;letter-spacing:1px;top:26%;text-shadow:0 2px 0 #1b4d80,0 3px 8px #000}
+  .toast.small{font-size:11px;letter-spacing:0.5px;top:24%;text-shadow:0 1px 0 #1b4d80,0 2px 6px #000}
   .toast.pop{animation:toast 1.1s ease forwards}
   @keyframes toast{0%{opacity:0;transform:translateX(-50%) scale(.6)}18%{opacity:1;transform:translateX(-50%) scale(1.08)}
     35%{transform:translateX(-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translateX(-50%) scale(1) translateY(-30px)}}
@@ -2060,10 +2060,12 @@ function spawnBoss(level, isMini){
   level=level||1;
   const meta=LEVELS[level-1];
   const conf={
-    1:{build:buildBoss,  y:1.8, scale:0.9,  hp:3800},
-    2:{build:buildBoss2, y:2.0, scale:1.0,  hp:6400},
-    3:{build:buildBoss2, y:2.2, scale:1.12, hp:9200},
-    4:{build:buildBoss2, y:2.4, scale:1.28, hp:11500},
+    // scale bumped ~15-18% over the original values — on wide/short landscape viewports (most phones) the
+    // boss was reading as small and distant rather than an imposing set-piece
+    1:{build:buildBoss,  y:2.0, scale:1.05, hp:3800},
+    2:{build:buildBoss2, y:2.2, scale:1.15, hp:6400},
+    3:{build:buildBoss2, y:2.4, scale:1.28, hp:9200},
+    4:{build:buildBoss2, y:2.6, scale:1.45, hp:11500},
   }[level];
   const mesh=conf.build();
   // Mini-boss: same model/level tuning, smaller & far less HP — a mid-level checkpoint, not the finale.
@@ -2265,7 +2267,9 @@ function hitBoss(dmg,pos){
   // Shield absorbs all damage
   if(boss.shieldActive>0){
     spawnHitSpark(pos); addShake(0.1);
-    HUD.showToast('SHIELDED!', true);
+    // throttled — rapid fire into a shielded boss would otherwise spam this every ~0.1s for the whole 3s window
+    const nowSh=performance.now();
+    if(!boss.lastShieldToast || nowSh-boss.lastShieldToast>900){ boss.lastShieldToast=nowSh; HUD.showToast('SHIELDED!', true); }
     return;
   }
   // Weak-point vs body damage: check if hit pos is near a weak point mesh
@@ -2278,7 +2282,8 @@ function hitBoss(dmg,pos){
   }
   const finalDmg = isWeakPoint ? dmg : Math.round(dmg*0.30);
   boss.hp-=finalDmg; boss.hitFlash=0.08; spawnHitSpark(pos);
-  if(!isWeakPoint && Math.random()<0.4) HUD.showToast('AIM FOR WEAK POINTS!', true);
+  // once per boss encounter — repeating this on 40% of every body hit was spammy and looked bad firing alone/often
+  if(!isWeakPoint && !boss.weakHintShown){ boss.weakHintShown=true; HUD.showToast('AIM FOR WEAK POINTS!', true); }
   // lower chance/power than before — at rapid fire rates this was triggering (and shaking the screen) almost every hit
   if(Math.random()<0.15) spawnExplosion(pos,0xffb14a,4,0.4);
   // Critical hit-confirm juice — throttled so rapid weak-point fire doesn't spam hit-stops back to back.
